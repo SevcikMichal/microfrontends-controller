@@ -1,0 +1,216 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.11.1
+  creationTimestamp: null
+  name: webcomponents.microfrontend.michalsevcik.dev
+spec:
+  group: microfrontend.michalsevcik.dev
+  names:
+    kind: WebComponent
+    listKind: WebComponentList
+    plural: webcomponents
+    shortNames:
+    - webc
+    singular: webcomponent
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: WebComponent is the Schema for the webcomponents API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: WebComponentSpec defines the desired state of WebComponent
+            properties:
+              context-elements:
+                description: These are components that can be displayed in a special
+                  context, such as ufe-app-shell for the top-level application shell
+                  or my-menu-item for components to be displayed in a custom menu,
+                  and so on.
+                items:
+                  properties:
+                    attributes:
+                      description: This is a list of key-value pairs that allows you
+                        to assign specific attributes to the element. The name field
+                        is used as the attribute name, while the value field can be
+                        any valid JSON type.
+                      items:
+                        properties:
+                          name:
+                            type: string
+                          value:
+                            type: string
+                            x-kubernetes-preserve-unknown-fields: true
+                        required:
+                        - name
+                        - value
+                        type: object
+                      type: array
+                    context-names:
+                      description: This is a list of context names in which this element
+                        is intended to be shown.
+                      items:
+                        type: string
+                      type: array
+                    element:
+                      description: This is the HTML element tag name to use when navigating
+                        to the specific path.
+                      type: string
+                    priority:
+                      default: 0
+                      description: This indicates the priority of the navigation entry
+                        in lists. Entries with higher priority are displayed before
+                        entries with lower priorities, if there is an ordering supported
+                        by the list. The default priority is 0.
+                      type: integer
+                    roles:
+                      items:
+                        type: string
+                      type: array
+                  required:
+                  - context-names
+                  - element
+                  type: object
+                type: array
+              hash-suffix:
+                description: A hash string used to identify a specific version of
+                  the module URI when the controller is proxying it. If the proxy
+                  property is set and the hash property is set as well, the final
+                  module file name will be web_component_name.hash_suffix.jsm, and
+                  the resource will be assumed to never expire. To refresh user agents'
+                  caches, the hash value needs to be changed to a new unique value.
+                type: string
+              module-uri:
+                description: The URI from which the module shall be accessed. The
+                  actual module is cached by the controller to improve performance
+                  and avoid CORS issues.
+                format: url
+                type: string
+              navigations:
+                description: Components with the navigation specification may be used
+                  as sub-paths and are considered as workspaces or applications on
+                  their own within the composed application shell.
+                items:
+                  properties:
+                    attributes:
+                      description: This is a list of key-value pairs that allows you
+                        to assign specific attributes to the element. The name field
+                        is used as the attribute name, while the value field can be
+                        any valid JSON type.
+                      items:
+                        properties:
+                          name:
+                            type: string
+                          value:
+                            type: string
+                            x-kubernetes-preserve-unknown-fields: true
+                        required:
+                        - name
+                        - value
+                        type: object
+                      type: array
+                    details:
+                      description: Additional description is provided to explain the
+                        purpose of the component to the user. It is displayed in addition
+                        to the title in the navigation lists.
+                      type: string
+                    element:
+                      description: The HTML element tag name to be used when navigating
+                        to the specific path.
+                      type: string
+                    icon:
+                      description: The optional icon is associated with the navigable
+                        component. SVG format is preferred. Either the data property
+                        should provide base64 encoded icon/image data or the url to
+                        the image source should be specified. The mime property must
+                        specify the proper MIME type of the icon/image.
+                      properties:
+                        data:
+                          type: string
+                        mime:
+                          type: string
+                        url:
+                          type: string
+                      required:
+                      - data
+                      - mime
+                      - url
+                      type: object
+                    path:
+                      description: By navigating to the specific subpath, the app
+                        shell will place the element on the main workspace (content)
+                        of the shell.
+                      type: string
+                    priority:
+                      default: 0
+                      description: This indicates the priority of the navigation entry
+                        in lists. Entries with higher priority are displayed before
+                        entries with lower priorities, if there is an ordering supported
+                        by the list. The default priority is 0.
+                      type: integer
+                    roles:
+                      items:
+                        type: string
+                      type: array
+                    title:
+                      description: The title is used to present links to the particular
+                        workspace or to display it in navigation lists, or as a title
+                        when on the specific path.
+                      type: string
+                  required:
+                  - element
+                  - path
+                  - title
+                  type: object
+                type: array
+              preload:
+                default: true
+                description: The modules are not preloaded by default but only when
+                  navigating to some of the subpaths mentioned in the 'navigation'
+                  list. Setting this property to true ensures that the module is loaded
+                  when the application starts.
+                type: boolean
+              proxy:
+                default: false
+                description: This specifies whether the loading of web components
+                  should be proxied by the controller. This is useful if the web component
+                  is served from within the cluster and cannot be accessed from outside
+                  the cluster network. The module will be served from the URL base_controller_url/web-components/web_component_name.jsm.
+                  This is the recommended approach for the standard assumed use-case.
+                type: boolean
+              style-relative-paths:
+                description: An array of relative paths (relative to module-uri) that
+                  contains the CSS styles required for this web component module.
+                  Ideally, the styles are either embedded in or loaded by the module.
+                  However, certain legacy styles may require an additional link element.
+                items:
+                  type: string
+                type: array
+            required:
+            - module-uri
+            type: object
+          status:
+            description: WebComponentStatus defines the observed state of WebComponent
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
