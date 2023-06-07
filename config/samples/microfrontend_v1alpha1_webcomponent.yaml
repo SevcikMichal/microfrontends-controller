@@ -1,0 +1,12 @@
+apiVersion: microfrontend.michalsevcik.dev/v1alpha1
+kind: WebComponent
+metadata:
+  labels:
+    app.kubernetes.io/name: webcomponent
+    app.kubernetes.io/instance: webcomponent-sample
+    app.kubernetes.io/part-of: microfrontends-controller
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: microfrontends-controller
+  name: webcomponent-sample
+spec:
+  # TODO(user): Add fields here

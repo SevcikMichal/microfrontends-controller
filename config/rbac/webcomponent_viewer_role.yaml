@@ -1,0 +1,27 @@
+# permissions for end users to view webcomponents.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: webcomponent-viewer-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: microfrontends-controller
+    app.kubernetes.io/part-of: microfrontends-controller
+    app.kubernetes.io/managed-by: kustomize
+  name: webcomponent-viewer-role
+rules:
+- apiGroups:
+  - microfrontend.michalsevcik.dev
+  resources:
+  - webcomponents
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - microfrontend.michalsevcik.dev
+  resources:
+  - webcomponents/status
+  verbs:
+  - get
