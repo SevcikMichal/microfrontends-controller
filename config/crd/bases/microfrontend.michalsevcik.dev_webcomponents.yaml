@@ -209,6 +209,8 @@ spec:
             properties:
               ready:
                 type: boolean
+              state:
+                type: string
             type: object
         required:
         - spec
