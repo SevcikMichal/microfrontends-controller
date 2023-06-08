@@ -89,7 +89,7 @@ func (r *WebComponentReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	if webComponent.Status.State == "" {
 		webComponent.Status.State = statusUnknown
 		if err = r.Status().Update(ctx, webComponent); err != nil {
-			log.Error(err, "Failed to update WebComponent status!")
+			log.Error(err, "Failed to update WebComponent status to unknown!")
 			return ctrl.Result{}, err
 		}
 
@@ -118,6 +118,11 @@ func (r *WebComponentReconciler) Reconcile(ctx context.Context, req ctrl.Request
 			log.Error(err, "Failed to update custom resource to add finalizer!")
 			return ctrl.Result{}, err
 		}
+
+		if err := r.Get(ctx, req.NamespacedName, webComponent); err != nil {
+			log.Error(err, "Failed to re-fetch WebComponent!")
+			return ctrl.Result{}, err
+		}
 	}
 
 	// Check if the Memcached instance is marked to be deleted, which is
@@ -130,7 +135,7 @@ func (r *WebComponentReconciler) Reconcile(ctx context.Context, req ctrl.Request
 			webComponent.Status.State = statusDeleting
 
 			if err := r.Status().Update(ctx, webComponent); err != nil {
-				log.Error(err, "Failed to update WebComponent status!")
+				log.Error(err, "Failed to update WebComponent status to Deleting!")
 				return ctrl.Result{}, err
 			}
 
@@ -152,6 +157,11 @@ func (r *WebComponentReconciler) Reconcile(ctx context.Context, req ctrl.Request
 
 			if err := r.Update(ctx, webComponent); err != nil {
 				log.Error(err, "Failed to remove finalizer for WebComponent!")
+				return ctrl.Result{}, err
+			}
+
+			if err := r.Get(ctx, req.NamespacedName, webComponent); err != nil {
+				log.Error(err, "Failed to re-fetch WebComponent!")
 				return ctrl.Result{}, err
 			}
 		}
