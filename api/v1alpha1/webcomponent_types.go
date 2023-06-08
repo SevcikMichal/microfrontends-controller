@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
@@ -91,7 +92,7 @@ type Attribute struct {
 
 	// +kubebuilder:validation:XPreserveUnknownFields
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
-	Value string `json:"value"`
+	Value runtime.RawExtension `json:"value"`
 }
 
 type Navigation struct {
