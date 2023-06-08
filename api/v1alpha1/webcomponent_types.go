@@ -91,6 +91,7 @@ type Attribute struct {
 	Name string `json:"name"`
 
 	// +kubebuilder:validation:XPreserveUnknownFields
+	// +kubebuilder:validation:Schemaless
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
 	Value runtime.RawExtension `json:"value"`
 }
