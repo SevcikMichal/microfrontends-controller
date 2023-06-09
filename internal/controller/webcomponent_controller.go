@@ -29,16 +29,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	microfrontendv1alpha1 "github.com/SevcikMichal/microfrontends-controller/api/v1alpha1"
+	"github.com/SevcikMichal/microfrontends-controller/internal/model"
 )
 
 const webComponentFinalizer = "microfrontend.michalsevcik.dev/finalizer"
-
-// Definitions to manage status states
-const (
-	statusUnknown   = "Unknown"
-	statusDeleting  = "Deleting"
-	statusAvailable = "Available"
-)
 
 // WebComponentReconciler reconciles a WebComponent object
 type WebComponentReconciler struct {
@@ -152,15 +146,9 @@ func (r *WebComponentReconciler) doFinalizerOperationsForWebComponent(webCompone
 
 func (r *WebComponentReconciler) readWebComponentSpec(webComponent *microfrontendv1alpha1.WebComponent) {
 	log := log.FromContext(context.Background())
-	log.Info("WebComponent spec",
-		"ModuleUri", webComponent.Spec.ModuleUri,
-		"Preload", webComponent.Spec.Preload,
-		"Proxy", webComponent.Spec.Proxy,
-		"HashSuffix", webComponent.Spec.HashSuffix,
-		"StyleRelativePaths", webComponent.Spec.StyleRelativePaths,
-		"ContextElements", webComponent.Spec.ContextElements,
-		"Navigations", webComponent.Spec.Navigations,
-	)
+	log.Info("Converting web component to frontend config.")
+	frontendConfig := model.CreateFrontendConfigFromWebComponent(webComponent)
+	log.Info("Frontend config created.", "fronendConfig", frontendConfig)
 }
 
 // SetupWithManager sets up the controller with the Manager.
