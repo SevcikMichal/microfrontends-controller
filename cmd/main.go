@@ -91,7 +91,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	frontendConfigs := new(sync.Map)
+	frontendConfigs := &sync.Map{}
 
 	if err = (&controller.WebComponentReconciler{
 		Client:          mgr.GetClient(),
