@@ -17,9 +17,13 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"flag"
+	"net/http"
 	"os"
 	"sync"
+
+	"github.com/gorilla/mux"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
@@ -33,6 +37,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	microfrontendv1alpha1 "github.com/SevcikMichal/microfrontends-controller/api/v1alpha1"
+	"github.com/SevcikMichal/microfrontends-controller/internal/api"
 	"github.com/SevcikMichal/microfrontends-controller/internal/controller"
 	//+kubebuilder:scaffold:imports
 )
@@ -114,16 +119,48 @@ func main() {
 		os.Exit(1)
 	}
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
+		defer cancel()
 
 		setupLog.Info("starting manager")
 		if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
 			setupLog.Error(err, "problem running manager")
-			os.Exit(1)
 		}
 	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		defer cancel()
+
+		frontendConfigApi := &api.MicroFrontendConfigApi{
+			MicroFrontendConfigs: microFrontendConfigs,
+		}
+
+		router := mux.NewRouter().StrictSlash(true)
+		router.HandleFunc("/fe-config", frontendConfigApi.GetMicroFrontendConfigs)
+
+		server := &http.Server{
+			Addr:    ":10000",
+			Handler: router,
+		}
+
+		go func() {
+			<-ctx.Done()
+			server.Shutdown(context.Background())
+		}()
+
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			setupLog.Error(err, "problem running server")
+		}
+	}()
+
+	<-ctx.Done()
 
 	wg.Wait()
 }

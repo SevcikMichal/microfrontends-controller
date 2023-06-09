@@ -71,6 +71,8 @@ spec:
         args:
         - --leader-elect
         image: controller:latest
+        ports:
+        - containerPort: 10000
         name: manager
         securityContext:
           allowPrivilegeEscalation: false
