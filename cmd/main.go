@@ -91,13 +91,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	frontendConfigs := &sync.Map{}
+	microFrontendConfigs := &sync.Map{}
 
 	if err = (&controller.WebComponentReconciler{
-		Client:          mgr.GetClient(),
-		Scheme:          mgr.GetScheme(),
-		Recorder:        mgr.GetEventRecorderFor("webcomponent-controller"),
-		FrontendConfigs: frontendConfigs,
+		Client:               mgr.GetClient(),
+		Scheme:               mgr.GetScheme(),
+		Recorder:             mgr.GetEventRecorderFor("webcomponent-controller"),
+		MicroFrontendConfigs: microFrontendConfigs,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "WebComponent")
 		os.Exit(1)

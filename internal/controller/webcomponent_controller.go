@@ -37,9 +37,9 @@ const webComponentFinalizer = "microfrontend.michalsevcik.dev/finalizer"
 // WebComponentReconciler reconciles a WebComponent object
 type WebComponentReconciler struct {
 	client.Client
-	Scheme          *runtime.Scheme
-	Recorder        record.EventRecorder
-	FrontendConfigs *sync.Map
+	Scheme               *runtime.Scheme
+	Recorder             record.EventRecorder
+	MicroFrontendConfigs *sync.Map
 }
 
 //+kubebuilder:rbac:groups=microfrontend.michalsevcik.dev,resources=webcomponents,verbs=get;list;watch;create;update;patch;delete
@@ -132,7 +132,7 @@ func (r *WebComponentReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{}, nil
 	}
 
-	r.readWebComponentSpec(webComponent)
+	r.addWebComponentSpecToMicroFrontendConfigs(webComponent)
 
 	// TODO: Maybe create a deployment and a service here eventually
 
@@ -140,15 +140,18 @@ func (r *WebComponentReconciler) Reconcile(ctx context.Context, req ctrl.Request
 }
 
 func (r *WebComponentReconciler) doFinalizerOperationsForWebComponent(webComponent *microfrontendv1alpha1.WebComponent) error {
-	// Add finalizer logic here
+	log := log.FromContext(context.Background())
+	log.Info("Removing web component from frontend configs.")
+	r.MicroFrontendConfigs.Delete(webComponent.ObjectMeta.UID)
 	return nil
 }
 
-func (r *WebComponentReconciler) readWebComponentSpec(webComponent *microfrontendv1alpha1.WebComponent) {
+func (r *WebComponentReconciler) addWebComponentSpecToMicroFrontendConfigs(webComponent *microfrontendv1alpha1.WebComponent) {
 	log := log.FromContext(context.Background())
 	log.Info("Converting web component to frontend config.")
 	frontendConfig := model.CreateFrontendConfigFromWebComponent(webComponent)
-	log.Info("Frontend config created.", "fronendConfig", frontendConfig)
+	log.Info("WebComponent converted to frontend config.", "UID", webComponent.ObjectMeta.UID)
+	r.MicroFrontendConfigs.Store(webComponent.ObjectMeta.UID, frontendConfig)
 }
 
 // SetupWithManager sets up the controller with the Manager.
