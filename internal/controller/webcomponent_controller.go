@@ -86,24 +86,6 @@ func (r *WebComponentReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{}, err
 	}
 
-	if webComponent.Status.State == "" {
-		webComponent.Status.State = statusUnknown
-		if err = r.Status().Update(ctx, webComponent); err != nil {
-			log.Error(err, "Failed to update WebComponent status to unknown!")
-			return ctrl.Result{}, err
-		}
-
-		// Let's re-fetch the WebComponent Custom Resource after update the status
-		// so that we have the latest state of the resource on the cluster and we will avoid
-		// raise the issue "the object has been modified, please apply
-		// your changes to the latest version and try again" which would re-trigger the reconciliation
-		// if we try to update it again in the following operations
-		if err := r.Get(ctx, req.NamespacedName, webComponent); err != nil {
-			log.Error(err, "Failed to re-fetch WebComponent!")
-			return ctrl.Result{}, err
-		}
-	}
-
 	// Let's add a finalizer. Then, we can define some operations which should
 	// occurs before the custom resource to be deleted.
 	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/finalizers
@@ -119,10 +101,7 @@ func (r *WebComponentReconciler) Reconcile(ctx context.Context, req ctrl.Request
 			return ctrl.Result{}, err
 		}
 
-		if err := r.Get(ctx, req.NamespacedName, webComponent); err != nil {
-			log.Error(err, "Failed to re-fetch WebComponent!")
-			return ctrl.Result{}, err
-		}
+		return ctrl.Result{}, nil
 	}
 
 	// Check if the Memcached instance is marked to be deleted, which is
@@ -131,13 +110,6 @@ func (r *WebComponentReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	if isWebComponentMarkedToBeDeleted {
 		if controllerutil.ContainsFinalizer(webComponent, webComponentFinalizer) {
 			log.Info("Performing finalizer operations for the WebComponent before deleting the custom resource.")
-
-			webComponent.Status.State = statusDeleting
-
-			if err := r.Status().Update(ctx, webComponent); err != nil {
-				log.Error(err, "Failed to update WebComponent status to Deleting!")
-				return ctrl.Result{}, err
-			}
 
 			if err := r.doFinalizerOperationsForWebComponent(webComponent); err != nil {
 				log.Error(err, "Failed to perform finalizer operations for the WebComponent!")
@@ -160,25 +132,15 @@ func (r *WebComponentReconciler) Reconcile(ctx context.Context, req ctrl.Request
 				return ctrl.Result{}, err
 			}
 
-			if err := r.Get(ctx, req.NamespacedName, webComponent); err != nil {
-				log.Error(err, "Failed to re-fetch WebComponent!")
-				return ctrl.Result{}, err
-			}
+			return ctrl.Result{}, nil
 		}
+
 		return ctrl.Result{}, nil
 	}
 
 	r.readWebComponentSpec(webComponent)
 
 	// TODO: Maybe create a deployment and a service here eventually
-
-	if webComponent.Status.State == statusUnknown {
-		webComponent.Status.State = statusAvailable
-		if err = r.Status().Update(ctx, webComponent); err != nil {
-			log.Error(err, "Failed to update WebComponent status!")
-			return ctrl.Result{}, err
-		}
-	}
 
 	return ctrl.Result{}, nil
 }

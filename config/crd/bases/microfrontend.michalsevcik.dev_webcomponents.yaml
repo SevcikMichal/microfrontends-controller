@@ -204,11 +204,6 @@ spec:
             type: object
           status:
             description: WebComponentStatus defines the observed state of WebComponent
-            properties:
-              ready:
-                type: boolean
-              state:
-                type: string
             type: object
         required:
         - spec
