@@ -23,7 +23,7 @@ func (api *MicroFrontendConfigApi) GetMicroFrontendConfigs(w http.ResponseWriter
 	//microFrontendModuleTransfer = []*contract.MicroFrontendModuleTransfer{}
 
 	api.MicroFrontendConfigs.Range(func(key, microFrontendConfig interface{}) bool {
-		config, ok := microFrontendConfig.(model.MicroFrontendConfig)
+		config, ok := microFrontendConfig.(*model.MicroFrontendConfig)
 
 		if !ok {
 			log.Fatal("Could not convert micro frontend config to model.MicroFrontendConfig.")
