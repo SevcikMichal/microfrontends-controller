@@ -29,13 +29,11 @@ type MicroFrontendNavigation struct {
 
 // TODO: Check wheteher some string spliting should be still applied here or not
 func (navigation *MicroFrontendNavigation) ExtractRoles() []string {
-	roles := []string{}
-
 	if len(navigation.Roles) > 0 {
-		roles = navigation.Roles
+		return navigation.Roles
+	} else {
+		return []string{"*"}
 	}
-
-	return roles
 }
 
 func (navigation *MicroFrontendNavigation) ExtractAttributes() []MicroFrontendAttribute {

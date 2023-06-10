@@ -23,3 +23,32 @@ type MicroFrontendContextElement struct {
 	Attributes   []MicroFrontendAttribute `json:"attributes,omitempty"`
 	Roles        []string                 `json:"roles,omitempty"`
 }
+
+// TODO: Check wheteher some string spliting should be still applied here or not
+func (context *MicroFrontendContextElement) ExtractRoles() []string {
+	if len(context.Roles) > 0 {
+		return context.Roles
+	} else {
+		return []string{"*"}
+	}
+}
+
+func (context *MicroFrontendContextElement) ExtractAttributes() []MicroFrontendAttribute {
+	attributes := []MicroFrontendAttribute{}
+
+	if len(context.Attributes) > 0 {
+		attributes = context.Attributes
+	}
+
+	return attributes
+}
+
+func (context *MicroFrontendContextElement) ExtractContextNames() []string {
+	contextNames := []string{}
+
+	if len(context.ContextNames) > 0 {
+		contextNames = context.ContextNames
+	}
+
+	return contextNames
+}

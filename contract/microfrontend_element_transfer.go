@@ -20,6 +20,6 @@ type MicroFrontendElementTransfer struct {
 	*MicroFrontendModuleTransfer
 	Element    string                            `json:"element"`
 	Attributes []*MicroFrontendAttributeTransfer `json:"attributes"`
-	Labels     map[string]string                 `json:"labels,omitempty"`
-	Roles      []string                          `json:"roles,omitempty"`
+	Labels     map[string]string                 `json:"labels"`
+	Roles      []string                          `json:"roles"`
 }

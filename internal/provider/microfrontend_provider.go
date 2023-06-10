@@ -29,6 +29,7 @@ import (
 const (
 	appTransfersKey     = "app-transfers"
 	preloadTrnasfersKey = "preload-transfers"
+	contextTransfersKey = "context-transfers"
 )
 
 type MicroFrontendProvider struct {
@@ -38,18 +39,20 @@ type MicroFrontendProvider struct {
 func (r *MicroFrontendProvider) SetMicroFrontendConfig(key types.UID, microFrontendConfig *model.MicroFrontendConfig) {
 	r.updateWebAppTransfers(key, microFrontendConfig)
 	r.updatePreloadTransfers(key, microFrontendConfig)
+	r.updateContextTransfers(key, microFrontendConfig)
 }
 
 func (r *MicroFrontendProvider) DeleteMicroFrontendConfig(key types.UID) {
 	r.deleteWebAppTransfers(key)
 	r.deletePreloadTransfers(key)
+	r.deleteContextTransfers(key)
 }
 
 func (r *MicroFrontendProvider) GetMicroFrontendConfigTransfer() *contract.MicroFrontendConfigurationTransfer {
 	frontendConfigTransfer := &contract.MicroFrontendConfigurationTransfer{
-		Apps:    r.getWebAppTransfers(),
-		Preload: r.getPreloadTransfers(),
-		// Contexts: ,
+		Apps:     r.getWebAppTransfers(),
+		Preload:  r.getPreloadTransfers(),
+		Contexts: r.getContextTransfers(),
 		// Anonymous: ,
 		// User: ,
 	}
@@ -81,6 +84,21 @@ func (r *MicroFrontendProvider) getPreloadTransfers() []*contract.MicroFrontendM
 	// Aggregate all preload transfers
 	preloadTransferMapCasted.Range(func(key, value interface{}) bool {
 		result = append(result, value.(*contract.MicroFrontendModuleTransfer))
+		return true
+	})
+
+	return result
+}
+
+func (r *MicroFrontendProvider) getContextTransfers() []*contract.MicroFrontendContextTransfer {
+	result := []*contract.MicroFrontendContextTransfer{}
+
+	contextTransfersMap, _ := r.MicroFrontendTransferStorage.LoadOrStore(contextTransfersKey, &sync.Map{})
+	contextTransferMapCasted := contextTransfersMap.(*sync.Map)
+
+	// Aggregate all context transfers
+	contextTransferMapCasted.Range(func(key, value interface{}) bool {
+		result = append(result, value.([]*contract.MicroFrontendContextTransfer)...)
 		return true
 	})
 
@@ -150,6 +168,36 @@ func (r *MicroFrontendProvider) deletePreloadTransfers(key types.UID) {
 	r.MicroFrontendTransferStorage.Store(preloadTrnasfersKey, preloadTransferMapCasted)
 }
 
+func (r *MicroFrontendProvider) updateContextTransfers(key types.UID, microFrontendConfig *model.MicroFrontendConfig) {
+	// Get a map of all context transfers that maps Resource UID to all context transfers that belongs to it
+	contextTransfersMap, _ := r.MicroFrontendTransferStorage.LoadOrStore(contextTransfersKey, &sync.Map{})
+	contextTransferMapCasted := contextTransfersMap.(*sync.Map)
+
+	// Generate a list of all context transfers that belongs to the given Resource UID
+	contextTransfers := []*contract.MicroFrontendContextTransfer{}
+	for _, context := range microFrontendConfig.ContextElements {
+		contextTransfers = append(contextTransfers, convertFrontendConfigToContextTransfer(microFrontendConfig, context))
+	}
+
+	// Store the list of all context transfers that belongs to the given Resource UID
+	contextTransferMapCasted.Store(key, contextTransfers)
+
+	// Store the map of all context transfers that maps Resource UID to all context transfers that belongs to its
+	r.MicroFrontendTransferStorage.Store(contextTransfersKey, contextTransferMapCasted)
+}
+
+func (r *MicroFrontendProvider) deleteContextTransfers(key types.UID) {
+	// Get a map of all context transfers that maps Resource UID to all context transfers that belongs to it
+	contextTransfersMap, _ := r.MicroFrontendTransferStorage.LoadOrStore(contextTransfersKey, &sync.Map{})
+	contextTransferMapCasted := contextTransfersMap.(*sync.Map)
+
+	// Delete references to this resouce UID
+	contextTransferMapCasted.Delete(key)
+
+	// Store the map of all context transfers that maps Resource UID to all context transfers that belongs to its
+	r.MicroFrontendTransferStorage.Store(contextTransfersKey, contextTransferMapCasted)
+}
+
 func convertFrontendConfigToAppTransfer(frontendConfig *model.MicroFrontendConfig, navigation model.MicroFrontendNavigation) *contract.MicroFrontendWebAppTransfer {
 	finalModuleUri := frontendConfig.ExtractModuleUri()
 
@@ -158,7 +206,6 @@ func convertFrontendConfigToAppTransfer(frontendConfig *model.MicroFrontendConfi
 		Styles:  frontendConfig.ExtractStyles(finalModuleUri),
 	}
 
-	// Create a new MicroFrontendElementAttributeTransfer object
 	originalAttributes := navigation.ExtractAttributes()
 	extractedAttributes := []*contract.MicroFrontendAttributeTransfer{}
 	if len(originalAttributes) > 0 {
@@ -167,7 +214,6 @@ func convertFrontendConfigToAppTransfer(frontendConfig *model.MicroFrontendConfi
 		}
 	}
 
-	// Create a new MicroFrontendElementTransfer object
 	element := &contract.MicroFrontendElementTransfer{
 		MicroFrontendModuleTransfer: module,
 		Element:                     navigation.Element,
@@ -176,7 +222,6 @@ func convertFrontendConfigToAppTransfer(frontendConfig *model.MicroFrontendConfi
 		Roles:                       navigation.ExtractRoles(),
 	}
 
-	// Create a new MicroFrontendWebAppTransfer object
 	webApp := &contract.MicroFrontendWebAppTransfer{
 		MicroFrontendElementTransfer: element,
 		Title:                        navigation.Title,
@@ -198,4 +243,36 @@ func convertFrontendConfigToPreloadTransfer(frontendConfig *model.MicroFrontendC
 	}
 
 	return module
+}
+
+func convertFrontendConfigToContextTransfer(frontendConfig *model.MicroFrontendConfig, context model.MicroFrontendContextElement) *contract.MicroFrontendContextTransfer {
+	finalModuleUri := frontendConfig.ExtractModuleUri()
+
+	module := &contract.MicroFrontendModuleTransfer{
+		LoadURL: finalModuleUri,
+		Styles:  frontendConfig.ExtractStyles(finalModuleUri),
+	}
+
+	originalAttributes := context.ExtractAttributes()
+	extractedAttributes := []*contract.MicroFrontendAttributeTransfer{}
+	if len(originalAttributes) > 0 {
+		for _, attribute := range originalAttributes {
+			extractedAttributes = append(extractedAttributes, attribute.ToContract())
+		}
+	}
+
+	element := &contract.MicroFrontendElementTransfer{
+		MicroFrontendModuleTransfer: module,
+		Element:                     context.Element,
+		Attributes:                  extractedAttributes,
+		Labels:                      frontendConfig.ExtractLabels(),
+		Roles:                       context.ExtractRoles(),
+	}
+
+	contextTransfer := &contract.MicroFrontendContextTransfer{
+		MicroFrontendElementTransfer: element,
+		ContextNames:                 context.ExtractContextNames(),
+	}
+
+	return contextTransfer
 }

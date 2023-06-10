@@ -1,0 +1,17 @@
+apiVersion: microfrontend.michalsevcik.dev/v1alpha1
+kind: WebComponent
+metadata: 
+  name: profile-ui
+spec:   
+  module-uri: http://profile-ui.wac-hospital/profile-ui.js 
+  preload: false
+  proxy: true
+  hash-suffix: v1alpha1
+  context-elements:
+  - context-names: [app-bar-tools]
+    element: profile-avatar
+    attributes: 
+    - name: svc
+      value: /avatar/
+    - name: size
+      value: 38px
