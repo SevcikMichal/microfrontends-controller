@@ -118,7 +118,9 @@ func (r *MicroFrontendProvider) deleteWebAppTransfers(key types.UID) {
 }
 
 func (r *MicroFrontendProvider) updatePreloadTransfers(key types.UID, microFrontendConfig *model.MicroFrontendConfig) {
+	// if preload is false we don't want to add the preload for this resource (if it is and update we want to remove it)
 	if !*microFrontendConfig.Preload {
+		r.deletePreloadTransfers(key)
 		return
 	}
 
