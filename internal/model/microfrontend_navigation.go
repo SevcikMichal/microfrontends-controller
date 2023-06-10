@@ -26,3 +26,24 @@ type MicroFrontendNavigation struct {
 	Icon       MicroFrontendIcon        `json:"icon,omitempty"`
 	Roles      []string                 `json:"roles,omitempty"`
 }
+
+// TODO: Check wheteher some string spliting should be still applied here or not
+func (navigation *MicroFrontendNavigation) ExtractRoles() []string {
+	roles := []string{}
+
+	if len(navigation.Roles) > 0 {
+		roles = navigation.Roles
+	}
+
+	return roles
+}
+
+func (navigation *MicroFrontendNavigation) ExtractAttributes() []MicroFrontendAttribute {
+	attributes := []MicroFrontendAttribute{}
+
+	if len(navigation.Attributes) > 0 {
+		attributes = navigation.Attributes
+	}
+
+	return attributes
+}

@@ -18,7 +18,6 @@ package controller
 
 import (
 	"context"
-	"sync"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -30,6 +29,7 @@ import (
 
 	microfrontendv1alpha1 "github.com/SevcikMichal/microfrontends-controller/api/v1alpha1"
 	"github.com/SevcikMichal/microfrontends-controller/internal/model"
+	"github.com/SevcikMichal/microfrontends-controller/internal/provider"
 )
 
 const webComponentFinalizer = "microfrontend.michalsevcik.dev/finalizer"
@@ -37,9 +37,9 @@ const webComponentFinalizer = "microfrontend.michalsevcik.dev/finalizer"
 // WebComponentReconciler reconciles a WebComponent object
 type WebComponentReconciler struct {
 	client.Client
-	Scheme               *runtime.Scheme
-	Recorder             record.EventRecorder
-	MicroFrontendConfigs *sync.Map
+	Scheme                *runtime.Scheme
+	Recorder              record.EventRecorder
+	MicroFrontendProvider *provider.MicroFrontendProvider
 }
 
 //+kubebuilder:rbac:groups=microfrontend.michalsevcik.dev,resources=webcomponents,verbs=get;list;watch;create;update;patch;delete
@@ -98,7 +98,7 @@ func (r *WebComponentReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{}, nil
 	}
 
-	// Check if the Memcached instance is marked to be deleted, which is
+	// Check if the WebComponent instance is marked to be deleted, which is
 	// indicated by the deletion timestamp being set.
 	isWebComponentMarkedToBeDeleted := webComponent.GetDeletionTimestamp() != nil
 	if isWebComponentMarkedToBeDeleted {
@@ -142,16 +142,18 @@ func (r *WebComponentReconciler) Reconcile(ctx context.Context, req ctrl.Request
 func (r *WebComponentReconciler) doFinalizerOperationsForWebComponent(webComponent *microfrontendv1alpha1.WebComponent) error {
 	log := log.FromContext(context.Background())
 	log.Info("Removing web component from frontend configs.")
-	r.MicroFrontendConfigs.Delete(webComponent.ObjectMeta.UID)
+	r.MicroFrontendProvider.DeleteMicroFrontendConfig(webComponent.ObjectMeta.UID)
 	return nil
 }
 
 func (r *WebComponentReconciler) addWebComponentSpecToMicroFrontendConfigs(webComponent *microfrontendv1alpha1.WebComponent) {
 	log := log.FromContext(context.Background())
 	log.Info("Converting web component to frontend config.")
+	log.Info("Resource", "version", webComponent.ObjectMeta.ResourceVersion)
 	frontendConfig := model.CreateFrontendConfigFromWebComponent(webComponent)
 	log.Info("WebComponent converted to frontend config.", "UID", webComponent.ObjectMeta.UID)
-	r.MicroFrontendConfigs.Store(webComponent.ObjectMeta.UID, frontendConfig)
+	log.Info("Storing new frontend config.", "UID", webComponent.ObjectMeta.UID)
+	r.MicroFrontendProvider.SetMicroFrontendConfig(webComponent.ObjectMeta.UID, frontendConfig)
 }
 
 // SetupWithManager sets up the controller with the Manager.

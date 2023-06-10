@@ -17,12 +17,33 @@ limitations under the License.
 package model
 
 import (
+	"strings"
+
 	microfrontendv1alpha1 "github.com/SevcikMichal/microfrontends-controller/api/v1alpha1"
 	"github.com/peteprogrammer/go-automapper"
 )
 
 func CreateFrontendConfigFromWebComponent(webComponent *microfrontendv1alpha1.WebComponent) *MicroFrontendConfig {
 	frontendConfig := &MicroFrontendConfig{}
-	automapper.Map(webComponent, frontendConfig)
+	automapper.MapLoose(webComponent.Spec, frontendConfig)
+	frontendConfig.MicroFrontendName = webComponent.ObjectMeta.Name
+	frontendConfig.MicroFrontendNamespace = webComponent.ObjectMeta.Namespace
+	frontendConfig.MicroFrontendLabels = webComponent.ObjectMeta.Labels
 	return frontendConfig
+}
+
+func RebaseUri(uri string) string {
+	base := "/" // TODO: Get from configuration
+	baseShort := base
+	baseFull := base
+	if strings.HasSuffix(base, "/") {
+		baseShort = base[:len(base)-1]
+	} else {
+		baseFull = base + "/"
+	}
+	if strings.HasPrefix(uri, "/") {
+		return baseShort + uri
+	} else {
+		return baseFull + uri
+	}
 }

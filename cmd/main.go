@@ -40,6 +40,7 @@ import (
 	microfrontendv1alpha1 "github.com/SevcikMichal/microfrontends-controller/api/v1alpha1"
 	"github.com/SevcikMichal/microfrontends-controller/internal/api"
 	"github.com/SevcikMichal/microfrontends-controller/internal/controller"
+	"github.com/SevcikMichal/microfrontends-controller/internal/provider"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -97,13 +98,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	microFrontendConfigs := &sync.Map{}
+	microFrontendProvider := &provider.MicroFrontendProvider{
+		MicroFrontendTransferStorage: &sync.Map{},
+	}
 
 	if err = (&controller.WebComponentReconciler{
-		Client:               mgr.GetClient(),
-		Scheme:               mgr.GetScheme(),
-		Recorder:             mgr.GetEventRecorderFor("webcomponent-controller"),
-		MicroFrontendConfigs: microFrontendConfigs,
+		Client:                mgr.GetClient(),
+		Scheme:                mgr.GetScheme(),
+		Recorder:              mgr.GetEventRecorderFor("webcomponent-controller"),
+		MicroFrontendProvider: microFrontendProvider,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "WebComponent")
 		os.Exit(1)
@@ -127,7 +130,7 @@ func main() {
 	go startManager(ctx, cancel, mgr)
 
 	wg.Add(1)
-	go startHTTPServer(ctx, microFrontendConfigs, cancel)
+	go startHTTPServer(ctx, microFrontendProvider, cancel)
 
 	<-ctx.Done()
 
@@ -144,12 +147,12 @@ func startManager(ctx context.Context, cancel context.CancelFunc, mgr manager.Ma
 	}
 }
 
-func startHTTPServer(ctx context.Context, microFrontendConfigs *sync.Map, cancel context.CancelFunc) {
+func startHTTPServer(ctx context.Context, microFrontendProvider *provider.MicroFrontendProvider, cancel context.CancelFunc) {
 	defer wg.Done()
 	defer cancel()
 
 	frontendConfigApi := &api.MicroFrontendConfigApi{
-		MicroFrontendConfigs: microFrontendConfigs,
+		MicroFrontendProvider: microFrontendProvider,
 	}
 
 	router := mux.NewRouter().StrictSlash(true)

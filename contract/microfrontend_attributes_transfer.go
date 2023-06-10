@@ -16,7 +16,7 @@ limitations under the License.
 
 package contract
 
-type MicroFrontendElementAttributeTransfer struct {
+type MicroFrontendAttributeTransfer struct {
 	Name  string      `json:"name"`
 	Value interface{} `json:"value"`
 }

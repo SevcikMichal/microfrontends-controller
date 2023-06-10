@@ -17,6 +17,6 @@ limitations under the License.
 package contract
 
 type MicroFrontendContextTransfer struct {
-	MicroFrontendElementTransfer
+	*MicroFrontendElementTransfer
 	ContextNames []string `json:"contextNames"`
 }

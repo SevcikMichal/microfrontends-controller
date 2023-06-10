@@ -16,9 +16,19 @@ limitations under the License.
 
 package model
 
-import "k8s.io/apimachinery/pkg/runtime"
+import (
+	"github.com/SevcikMichal/microfrontends-controller/contract"
+	"k8s.io/apimachinery/pkg/runtime"
+)
 
 type MicroFrontendAttribute struct {
 	Name  string               `json:"name"`
 	Value runtime.RawExtension `json:"value"`
+}
+
+func (attribute *MicroFrontendAttribute) ToContract() *contract.MicroFrontendAttributeTransfer {
+	return &contract.MicroFrontendAttributeTransfer{
+		Name:  attribute.Name,
+		Value: attribute.Value.Raw,
+	}
 }
