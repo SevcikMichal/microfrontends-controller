@@ -35,6 +35,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
 
 	microfrontendv1alpha1 "github.com/SevcikMichal/microfrontends-controller/api/v1alpha1"
 	"github.com/SevcikMichal/microfrontends-controller/internal/api"
@@ -123,44 +124,48 @@ func main() {
 	defer cancel()
 
 	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		defer cancel()
-
-		setupLog.Info("starting manager")
-		if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
-			setupLog.Error(err, "problem running manager")
-		}
-	}()
+	go startManager(ctx, cancel, mgr)
 
 	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		defer cancel()
-
-		frontendConfigApi := &api.MicroFrontendConfigApi{
-			MicroFrontendConfigs: microFrontendConfigs,
-		}
-
-		router := mux.NewRouter().StrictSlash(true)
-		router.HandleFunc("/fe-config", frontendConfigApi.GetMicroFrontendConfigs)
-
-		server := &http.Server{
-			Addr:    ":10000",
-			Handler: router,
-		}
-
-		go func() {
-			<-ctx.Done()
-			server.Shutdown(context.Background())
-		}()
-
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			setupLog.Error(err, "problem running server")
-		}
-	}()
+	go startHTTPServer(ctx, microFrontendConfigs, cancel)
 
 	<-ctx.Done()
 
 	wg.Wait()
+}
+
+func startManager(ctx context.Context, cancel context.CancelFunc, mgr manager.Manager) {
+	defer wg.Done()
+	defer cancel()
+
+	setupLog.Info("starting manager")
+	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
+		setupLog.Error(err, "problem running manager")
+	}
+}
+
+func startHTTPServer(ctx context.Context, microFrontendConfigs *sync.Map, cancel context.CancelFunc) {
+	defer wg.Done()
+	defer cancel()
+
+	frontendConfigApi := &api.MicroFrontendConfigApi{
+		MicroFrontendConfigs: microFrontendConfigs,
+	}
+
+	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/fe-config", frontendConfigApi.GetMicroFrontendConfigs)
+
+	server := &http.Server{
+		Addr:    ":10000",
+		Handler: router,
+	}
+
+	go func() {
+		<-ctx.Done()
+		server.Shutdown(context.Background())
+	}()
+
+	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		setupLog.Error(err, "problem running server")
+	}
 }
