@@ -16,7 +16,9 @@ limitations under the License.
 
 package contract
 
+import "k8s.io/apimachinery/pkg/runtime"
+
 type MicroFrontendAttributeTransfer struct {
-	Name  string      `json:"name"`
-	Value interface{} `json:"value"`
+	Name  string               `json:"name"`
+	Value runtime.RawExtension `json:"value"`
 }

@@ -29,6 +29,6 @@ type MicroFrontendAttribute struct {
 func (attribute *MicroFrontendAttribute) ToContract() *contract.MicroFrontendAttributeTransfer {
 	return &contract.MicroFrontendAttributeTransfer{
 		Name:  attribute.Name,
-		Value: attribute.Value.Raw,
+		Value: attribute.Value,
 	}
 }
