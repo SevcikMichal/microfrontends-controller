@@ -177,14 +177,14 @@ spec:
                   type: object
                 type: array
               preload:
-                default: true
+                default: false
                 description: The modules are not preloaded by default but only when
                   navigating to some of the subpaths mentioned in the 'navigation'
                   list. Setting this property to true ensures that the module is loaded
                   when the application starts.
                 type: boolean
               proxy:
-                default: false
+                default: true
                 description: This specifies whether the loading of web components
                   should be proxied by the controller. This is useful if the web component
                   is served from within the cluster and cannot be accessed from outside

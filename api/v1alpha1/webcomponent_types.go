@@ -35,12 +35,12 @@ type WebComponentSpec struct {
 	ModuleUri string `json:"module-uri"`
 
 	// The modules are not preloaded by default but only when navigating to some of the subpaths mentioned in the 'navigation' list. Setting this property to true ensures that the module is loaded when the application starts.
-	// +kubebuilder:default=true
+	// +kubebuilder:default=false
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
 	Preload bool `json:"preload,omitempty"`
 
 	// This specifies whether the loading of web components should be proxied by the controller. This is useful if the web component is served from within the cluster and cannot be accessed from outside the cluster network. The module will be served from the URL base_controller_url/web-components/web_component_name.jsm. This is the recommended approach for the standard assumed use-case.
-	// +kubebuilder:default=false
+	// +kubebuilder:default=true
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
 	Proxy bool `json:"proxy,omitempty"`
 
