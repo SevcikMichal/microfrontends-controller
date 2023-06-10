@@ -74,11 +74,8 @@ func (r *MicroFrontendProvider) updateWebAppTransfers(key types.UID, microFronte
 	webAppTransfersMap, _ := r.MicroFrontendTransferStorage.LoadOrStore(appTransfersKey, &sync.Map{})
 	webAppTransferMapCasted := webAppTransfersMap.(*sync.Map)
 
-	// Delete to make sure it is reflecting the latest state always
-	webAppTransferMapCasted.Delete(key)
-	webAppTransfers := []*contract.MicroFrontendWebAppTransfer{}
-
 	// Generate a list of all web app transfers that belongs to the given Resource UID
+	webAppTransfers := []*contract.MicroFrontendWebAppTransfer{}
 	for _, navigation := range microFrontendConfig.Navigations {
 		webAppTransfers = append(webAppTransfers, convertFrontendConfigToAppTransfer(microFrontendConfig, navigation))
 	}
@@ -110,9 +107,6 @@ func (r *MicroFrontendProvider) updatePreloadTransfers(key types.UID, microFront
 	// Get a map of all preload transfers that maps Resource UID to all preload transfers that belongs to it
 	preloadTransfersMap, _ := r.MicroFrontendTransferStorage.LoadOrStore(preloadTrnasfersKey, &sync.Map{})
 	preloadTransferMapCasted := preloadTransfersMap.(*sync.Map)
-
-	// Delete to make sure it is reflecting the latest state always
-	preloadTransferMapCasted.Delete(key)
 
 	// Create preload transfer from the resource
 	preloadTransfer := convertFrontendConfigToPreloadTransfer(microFrontendConfig)
