@@ -37,12 +37,12 @@ type WebComponentSpec struct {
 	// The modules are not preloaded by default but only when navigating to some of the subpaths mentioned in the 'navigation' list. Setting this property to true ensures that the module is loaded when the application starts.
 	// +kubebuilder:default=false
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
-	Preload bool `json:"preload,omitempty"`
+	Preload *bool `json:"preload,omitempty"`
 
 	// This specifies whether the loading of web components should be proxied by the controller. This is useful if the web component is served from within the cluster and cannot be accessed from outside the cluster network. The module will be served from the URL base_controller_url/web-components/web_component_name.jsm. This is the recommended approach for the standard assumed use-case.
 	// +kubebuilder:default=true
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
-	Proxy bool `json:"proxy,omitempty"`
+	Proxy *bool `json:"proxy,omitempty"`
 
 	// A hash string used to identify a specific version of the module URI when the controller is proxying it. If the proxy property is set and the hash property is set as well, the final module file name will be web_component_name.hash_suffix.jsm, and the resource will be assumed to never expire. To refresh user agents' caches, the hash value needs to be changed to a new unique value.
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
@@ -75,7 +75,7 @@ type ContextElement struct {
 	// This indicates the priority of the navigation entry in lists. Entries with higher priority are displayed before entries with lower priorities, if there is an ordering supported by the list. The default priority is 0.
 	// +kubebuilder:default=0
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
-	Priority int `json:"priority,omitempty"`
+	Priority *int `json:"priority,omitempty"`
 
 	// This is a list of key-value pairs that allows you to assign specific attributes to the element. The name field is used as the attribute name, while the value field can be any valid JSON type.
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
@@ -111,7 +111,7 @@ type Navigation struct {
 	// This indicates the priority of the navigation entry in lists. Entries with higher priority are displayed before entries with lower priorities, if there is an ordering supported by the list. The default priority is 0.
 	// +kubebuilder:default=0
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
-	Priority int `json:"priority,omitempty"`
+	Priority *int `json:"priority,omitempty"`
 
 	// Additional description is provided to explain the purpose of the component to the user. It is displayed in addition to the title in the navigation lists.
 	// +operator-sdk:csv:customresourcedefinitions:type=spec

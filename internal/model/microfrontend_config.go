@@ -23,8 +23,8 @@ import (
 
 type MicroFrontendConfig struct {
 	ModuleUri              string
-	Preload                bool                          `json:"preload,omitempty"`
-	Proxy                  bool                          `json:"proxy,omitempty"`
+	Preload                *bool                         `json:"preload,omitempty"`
+	Proxy                  *bool                         `json:"proxy,omitempty"`
 	HashSuffix             string                        `json:"hash-suffix,omitempty"`
 	StyleRelativePaths     []string                      `json:"style-relative-paths,omitempty"`
 	ContextElements        []MicroFrontendContextElement `json:"context-elements,omitempty"`
@@ -37,7 +37,7 @@ type MicroFrontendConfig struct {
 func (frontendConfig *MicroFrontendConfig) ExtractModuleUri() string {
 	if frontendConfig.ModuleUri == "built-in" {
 		return ""
-	} else if frontendConfig.Proxy {
+	} else if *frontendConfig.Proxy {
 		suffix := ""
 
 		if frontendConfig.HashSuffix != "" {

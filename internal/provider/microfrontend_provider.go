@@ -118,7 +118,7 @@ func (r *MicroFrontendProvider) deleteWebAppTransfers(key types.UID) {
 }
 
 func (r *MicroFrontendProvider) updatePreloadTransfers(key types.UID, microFrontendConfig *model.MicroFrontendConfig) {
-	if !microFrontendConfig.Preload {
+	if !*microFrontendConfig.Preload {
 		return
 	}
 
@@ -180,7 +180,7 @@ func convertFrontendConfigToAppTransfer(frontendConfig *model.MicroFrontendConfi
 		Title:                        navigation.Title,
 		Details:                      navigation.Details,
 		Path:                         navigation.Path,
-		Priority:                     navigation.Priority,
+		Priority:                     *navigation.Priority,
 		// Icon:                         navigation.Icon.Url, TODO: What is happening here in prolog?
 	}
 
