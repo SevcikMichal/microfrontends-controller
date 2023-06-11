@@ -189,7 +189,9 @@ func startHTTPServer(ctx context.Context, microFrontendProvider *provider.MicroF
 
 	router := mux.NewRouter().StrictSlash(true)
 	router = router.PathPrefix(configuration.GetBaseURL()).Subrouter()
+
 	router.HandleFunc("/fe-config", frontendConfigApi.GetMicroFrontendConfigs)
+	router.HandleFunc("/fe-config.mjs", frontendConfigApi.GetMicroFrontendConfigsAsJavaScritp)
 
 	server := &http.Server{
 		Addr:    ":10000",
