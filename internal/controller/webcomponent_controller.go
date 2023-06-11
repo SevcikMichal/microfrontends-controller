@@ -127,8 +127,6 @@ func (r *WebComponentReconciler) Reconcile(ctx context.Context, req ctrl.Request
 
 	r.addWebComponentSpecToMicroFrontendConfigs(webComponent)
 
-	// TODO: Maybe create a deployment and a service here eventually
-
 	return ctrl.Result{}, nil
 }
 
