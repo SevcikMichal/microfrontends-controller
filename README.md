@@ -9,7 +9,7 @@ The original ufe-controller was implemented in Prolog using the Kubernetes (k8s)
 The aim of this project is to use operator-sdk and Golang to recreate what was done in the ufe-controller. It was created as a learning experience to understand how the k8s operators work and how to implement one.
 
 There are two main components in the application: WebComponentController and an API server serving the fe-config.
-Tes
+
 WebComponentController is reconciling the WebComponent CRs. Currently, it is applying the following logic on a WebComponent:
 
 - Check if the WebComponent still exists.
