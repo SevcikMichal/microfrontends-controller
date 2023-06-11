@@ -20,7 +20,10 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 
+	"github.com/SevcikMichal/microfrontends-controller/contract"
+	"github.com/SevcikMichal/microfrontends-controller/internal/configuration"
 	"github.com/SevcikMichal/microfrontends-controller/internal/provider"
 )
 
@@ -31,5 +34,36 @@ type MicroFrontendConfigApi struct {
 func (api *MicroFrontendConfigApi) GetMicroFrontendConfigs(w http.ResponseWriter, r *http.Request) {
 	log.Println("Request to get micro frontend configs started.")
 
-	json.NewEncoder(w).Encode(api.MicroFrontendProvider.GetMicroFrontendConfigTransfer())
+	frontendConfig := api.MicroFrontendProvider.GetMicroFrontendConfigTransfer()
+
+	userContext := getUserContext(&r.Header)
+	if userContext != nil {
+		frontendConfig.User = userContext
+	} else {
+		frontendConfig.Anonymous = new(bool)
+		*frontendConfig.Anonymous = true
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(frontendConfig)
+}
+
+func getUserContext(r *http.Header) *contract.MicroFrontendUserInfoTransfer {
+	userId := r.Get(configuration.GetUserIdHeader())
+	userEmail := r.Get(configuration.GetUserEmailHeader())
+	userName := r.Get(configuration.GetUserNameHeader())
+	userRoles := r.Get(configuration.GetUserRolesHeader())
+
+	if len(userId) == 0 || len(userEmail) == 0 || len(userName) == 0 || len(userRoles) == 0 {
+		return nil
+	}
+
+	userRolesArray := strings.Split(userRoles, ",")
+
+	return &contract.MicroFrontendUserInfoTransfer{
+		ID:    userId,
+		Email: userEmail,
+		Name:  userName,
+		Roles: userRolesArray,
+	}
 }

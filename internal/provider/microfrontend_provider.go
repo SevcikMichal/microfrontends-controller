@@ -49,12 +49,11 @@ func (r *MicroFrontendProvider) DeleteMicroFrontendConfig(key types.UID) {
 }
 
 func (r *MicroFrontendProvider) GetMicroFrontendConfigTransfer() *contract.MicroFrontendConfigurationTransfer {
+
 	frontendConfigTransfer := &contract.MicroFrontendConfigurationTransfer{
 		Apps:     r.getWebAppTransfers(),
 		Preload:  r.getPreloadTransfers(),
 		Contexts: r.getContextTransfers(),
-		// Anonymous: ,
-		// User: ,
 	}
 
 	return frontendConfigTransfer
