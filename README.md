@@ -1,5 +1,5 @@
 # microfrontends-controller
-This repository is a (GO) re-implementation of the [Kubernetes Controller] pattern over custom resources specifying front-end web components to be dynamically integrated into a user interface application shell, using operator-sdk. It is heavily inspired by https://github.com/milung/ufe-controller.
+This repository is a (GO) re-implementation of the [Kubernetes Controller] pattern over custom resources specifying front-end web components to be dynamically integrated into a user interface application shell, using operator-sdk. It is heavily inspired by https://github.com/milung/ufe-controller. The project is of educational nature.
 
 This is an experimental concept design of micro-frontends architecture, considering declarative definition of micro-frontends as part of the Kubernetes API custom resource definitions, and leveraging the web components technology. This enables us to approach the development of particular micro-frontends in a similar way as is done with the development of cloud-native microservices.
 
