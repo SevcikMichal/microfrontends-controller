@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: namespaced
+  labels:
+    name: namespaced
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: should-be-excluded
+  labels:
+    name: should-be-excluded
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: namespaced-different
+  labels:
+    name: namespaced-different
