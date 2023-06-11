@@ -18,6 +18,8 @@ COPY contract/ contract/
 COPY internal/controller/ internal/controller/
 COPY internal/model/ internal/model/
 COPY internal/api/ internal/api/
+COPY internal/configuration/ internal/configuration/
+COPY internal/provider/ internal/provider/
 
 # Build
 # the GOARCH has not a default value to allow the binary be built according to the host where the command
