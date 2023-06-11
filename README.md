@@ -23,7 +23,7 @@ The API server simply takes the last snapshot of the in-memory storage and retur
 Here is a list of functionality that is provided by the original ufe-controller and whit information of what is implemented in the go alternative:
 - [x] An operator observing specific CRs either on specific namespaces or in all
 - [x] REST endpoint serving the MicroFrontendConfiguration as JSON (`/fe-config`)
-- [] REST endpoint serving the MicroFrontendConfiguration as JavaScript
+- [ ] REST endpoint serving the MicroFrontendConfiguration as JavaScript
 - TBD
 
 ### Configuration
