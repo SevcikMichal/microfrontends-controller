@@ -2,6 +2,7 @@ package configuration
 
 import (
 	"os"
+	"strings"
 )
 
 const (
@@ -83,8 +84,14 @@ func GetManifestTemplate() string {
 	return os.Getenv(ManifestTemplate)
 }
 
-func GetObserveNamespaces() string {
-	return os.Getenv(ObserveNamespaces)
+func GetObserveNamespaces() []string {
+	value, ok := os.LookupEnv(ObserveNamespaces)
+
+	if ok {
+		return strings.Split(value, ",")
+	}
+
+	return []string{}
 }
 
 func GetPwaMode() string {
