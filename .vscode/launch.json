@@ -9,7 +9,10 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/cmd/main.go"
+            "program": "${workspaceFolder}/cmd/main.go",
+            "env": {
+                //"BASE_URL": "/ui",
+            }
         },
         {
             "name": "Launch and observe selected namespaces",
