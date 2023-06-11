@@ -48,6 +48,31 @@ func (api *MicroFrontendConfigApi) GetMicroFrontendConfigs(w http.ResponseWriter
 	json.NewEncoder(w).Encode(frontendConfig)
 }
 
+func (api *MicroFrontendConfigApi) GetMicroFrontendConfigsAsJavaScritp(w http.ResponseWriter, r *http.Request) {
+	log.Println("Request to get micro frontend configs started.")
+
+	frontendConfig := api.MicroFrontendProvider.GetMicroFrontendConfigTransfer()
+
+	userContext := getUserContext(&r.Header)
+	if userContext != nil {
+		frontendConfig.User = userContext
+	} else {
+		frontendConfig.Anonymous = new(bool)
+		*frontendConfig.Anonymous = true
+	}
+
+	frontendConfigJson, err := json.Marshal(frontendConfig)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	frontendConfigJavaScript := "self.feConfig = " + string(frontendConfigJson) + ";"
+
+	w.Header().Set("Content-Type", "text/javascript")
+	w.Write([]byte(frontendConfigJavaScript))
+}
+
 func getUserContext(r *http.Header) *contract.MicroFrontendUserInfoTransfer {
 	userId := r.Get(configuration.GetUserIdHeader())
 	userEmail := r.Get(configuration.GetUserEmailHeader())
