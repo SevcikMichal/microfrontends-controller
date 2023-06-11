@@ -1,7 +1,5 @@
 # microfrontends-controller
-This repo is heavily inspired by https://github.com/milung/ufe-controller.
-
-It is a (GO) re-implementation of the [Kubernetes Controller] pattern over custom resources specifying front-end web components to be dynamically integrated into a user interface application shell, using operator-sdk.
+This repository is a (GO) re-implementation of the [Kubernetes Controller] pattern over custom resources specifying front-end web components to be dynamically integrated into a user interface application shell, using operator-sdk. It is heavily inspired by https://github.com/milung/ufe-controller.
 
 This is an experimental concept design of micro-frontends architecture, considering declarative definition of micro-frontends as part of the Kubernetes API custom resource definitions, and leveraging the web components technology. This enables us to approach the development of particular micro-frontends in a similar way as is done with the development of cloud-native microservices.
 
@@ -10,18 +8,19 @@ The original ufe-controller was implemented in Prolog using the Kubernetes (k8s)
 
 The aim of this project is to use operator-sdk and Golang to recreate what was done in the ufe-controller. It was created as a learning experience to understand how the k8s operators work and how to implement one.
 
-There are two main components in the application WebComponentController and an API server serving the fe-config. 
+There are two main components in the application: WebComponentController and an API server serving the fe-config.
 
-WebComponentController is reconciling the WebComponent CRs. Currently it is applying following logic on a WebComponent:
-- check if the WebComponent still exists.
-- if WebComponent does not contain finalizers id adds one so that the controller do it's cleanup before the k8s removes the WebComponent.
-- it converts the WebComponent to internal MicroFrontendConfig model which in turn is converted to TransferObject and stored in memory to be served through the `fe-config` endpoint.
-- if WebComponent is set to be deleted it removes it also from the in memory storage so it is no longer a part of `fe-config` response.
+WebComponentController is reconciling the WebComponent CRs. Currently, it is applying the following logic on a WebComponent:
 
-The API server simply takes last snapshot of the in-memory storage and returns it to the frontend.
+- Check if the WebComponent still exists.
+- If WebComponent does not contain finalizers it adds one so that the controller does its cleanup before the k8s removes the WebComponent.
+- It converts the WebComponent to internal MicroFrontendConfig model which in turn is converted to TransferObject and stored in memory to be served through the fe-config endpoint.
+- If WebComponent is set to be deleted it removes it also from the in-memory storage so it is no longer a part of fe-config response.
+
+The API server simply takes the last snapshot of the in-memory storage and returns it to the frontend.
 
 ### Migration TODO list:
-Here is a list of functionality that is provided by the original ufe-controller and what is implemented in the go alternative:
+Here is a list of functionality that is provided by the original ufe-controller and whit information of what is implemented in the go alternative:
 - [x] An operator observing specific CRs either on specific namespaces or in all
 - [x] REST endpoint serving the MicroFrontendConfiguration as JSON (`/fe-config`)
 - [] REST endpoint serving the MicroFrontendConfiguration as JavaScript
