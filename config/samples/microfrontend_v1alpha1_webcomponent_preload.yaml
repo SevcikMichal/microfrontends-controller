@@ -1,0 +1,19 @@
+apiVersion: microfrontend.michalsevcik.dev/v1alpha1
+kind: WebComponent
+metadata: 
+  name: preload-ufe
+spec:   
+  module-uri: http://preload-ufe.wac-hospital/build/ambulance-list.esm.js
+  navigations:
+    - element: preload-wl-app
+      path: preload-wl
+      title: Zoznam čakajúcich msevcik
+      details: Spravuje zoznam pacientov čakajúcich na vyšetrenie v ambulancii
+      attributes:
+        - name: api-uri
+          value: /msevcik-waiting-list-api
+        - name: ambulance
+          value: bobulova
+  preload: true
+  proxy: true
+  hash-suffix: v1alpha1
