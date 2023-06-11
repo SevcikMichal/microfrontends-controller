@@ -61,7 +61,13 @@ func GetApplicationTitle() string {
 }
 
 func GetBaseURL() string {
-	return os.Getenv(BaseURL)
+	value, ok := os.LookupEnv(BaseURL)
+
+	if ok {
+		return value
+	}
+
+	return "/"
 }
 
 func GetFaviconIco() string {

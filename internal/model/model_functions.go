@@ -20,6 +20,7 @@ import (
 	"strings"
 
 	microfrontendv1alpha1 "github.com/SevcikMichal/microfrontends-controller/api/v1alpha1"
+	"github.com/SevcikMichal/microfrontends-controller/internal/configuration"
 	"github.com/peteprogrammer/go-automapper"
 )
 
@@ -33,7 +34,7 @@ func CreateFrontendConfigFromWebComponent(webComponent *microfrontendv1alpha1.We
 }
 
 func RebaseUri(uri string) string {
-	base := "/" // TODO: Get from configuration
+	base := configuration.GetBaseURL()
 	baseShort := base
 	baseFull := base
 	if strings.HasSuffix(base, "/") {

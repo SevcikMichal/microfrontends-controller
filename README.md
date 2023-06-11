@@ -30,7 +30,7 @@ Here is a list of functionality that is provided by the original ufe-controller 
 You can use environment variables to configure the following parameters:
 | Env. Variable | Default Value | Description |
 |- |- |- |
-|BASE_URL|\\ |Base URL of the server, all absolute links are prefixed with this address|
+|BASE_URL| / |Base URL of the server, all absolute links are prefixed with this address|
 |OBSERVE_NAMESPACES||Comma separated list of namespaces in which to look for webcomponents to be served by this instance|
 |USER_ID_HEADER|x-forwarded-email|incomming request`s header name (lowercase) specifying the user identifier, typically email|
 |USER_NAME_HEADER|x-forwarded-user|incomming request`s header name (lowercase) specifying the user name|
