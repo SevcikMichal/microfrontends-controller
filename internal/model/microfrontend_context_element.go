@@ -24,7 +24,6 @@ type MicroFrontendContextElement struct {
 	Roles        []string                 `json:"roles,omitempty"`
 }
 
-// TODO: Check wheteher some string spliting should be still applied here or not
 func (context *MicroFrontendContextElement) ExtractRoles() []string {
 	if len(context.Roles) > 0 {
 		return context.Roles
