@@ -17,6 +17,7 @@ limitations under the License.
 package provider
 
 import (
+	"strings"
 	"sync"
 
 	"github.com/SevcikMichal/microfrontends-controller/contract"
@@ -93,13 +94,28 @@ func convertFrontendConfigToAppTransfer(frontendConfig *model.MicroFrontendConfi
 		Roles:                       navigation.ExtractRoles(),
 	}
 
+	navigationPath := navigation.Path
+	var iconPath string
+	if strings.HasSuffix(navigationPath, "/") {
+		iconPath = navigationPath
+	} else {
+		navigationPath = navigationPath + "/"
+		iconPath = navigationPath
+	}
+
+	if navigation.Icon != nil {
+		iconPath = navigation.Icon.ExtractIconPath(iconPath)
+	} else {
+		iconPath = ""
+	}
+
 	webApp := &contract.MicroFrontendWebAppTransfer{
 		MicroFrontendElementTransfer: element,
 		Title:                        navigation.Title,
 		Details:                      navigation.Details,
-		Path:                         navigation.Path,
+		Path:                         navigationPath,
 		Priority:                     *navigation.Priority,
-		// Icon:                         navigation.Icon.Url, TODO: What is happening here in prolog?
+		Icon:                         iconPath,
 	}
 
 	return webApp

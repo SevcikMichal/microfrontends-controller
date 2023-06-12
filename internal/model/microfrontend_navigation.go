@@ -23,7 +23,7 @@ type MicroFrontendNavigation struct {
 	Details    string                   `json:"details,omitempty"`
 	Element    string                   `json:"element"`
 	Attributes []MicroFrontendAttribute `json:"attributes,omitempty"`
-	Icon       MicroFrontendIcon        `json:"icon,omitempty"`
+	Icon       *MicroFrontendIcon       `json:"icon,omitempty"`
 	Roles      []string                 `json:"roles,omitempty"`
 }
 

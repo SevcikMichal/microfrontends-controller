@@ -21,3 +21,9 @@ type MicroFrontendIcon struct {
 	Data string `json:"data"`
 	Url  string `json:"url"`
 }
+
+func (icon *MicroFrontendIcon) ExtractIconPath(iconPath string) string {
+	appIconUri := RebaseUri("/app-icons/")
+	iconUrl := appIconUri + iconPath
+	return iconUrl
+}
