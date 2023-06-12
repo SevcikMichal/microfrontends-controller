@@ -2,5 +2,6 @@
 resources:
 - microfrontend_v1alpha1_webcomponent.yaml
 - microfrontend_v1alpha1_webcomponent_preload.yaml
-- microfrontend_v1aplha1_webcomponent_context.yaml
+- microfrontend_v1alpha1_webcomponent_context.yaml
+- microfrontend_v1alpha1_webcomponent_icon.yaml
 #+kubebuilder:scaffold:manifestskustomizesamples
