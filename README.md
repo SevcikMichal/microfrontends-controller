@@ -22,9 +22,20 @@ The API server simply takes the last snapshot of the in-memory storage and retur
 ### Migration TODO list:
 Here is a list of functionality that is provided by the original ufe-controller and whit information of what is implemented in the go alternative:
 - [x] An operator observing specific CRs either on specific namespaces or in all
-- [x] REST endpoint serving the MicroFrontendConfiguration as JSON (`/fe-config`)
-- [x] REST endpoint serving the MicroFrontendConfiguration as JavaScript
-- TBD
+- [x] endpoint serving the MicroFrontendConfiguration as JSON (`/fe-config`)
+- [x] endpoint serving the MicroFrontendConfiguration as JavaScript (`/fe-config.mjs`)
+- [ ] endpoint serving healthcheck for API server
+- [ ] endpoint serving webcomponents
+---
+- [ ] Include fronted part
+  - [ ] endpoint serving manifest
+  - [ ] endpoint serving service worker
+  - [ ] endpoint serving assets
+  - [ ] endpoint serving fonts
+  - [ ] endpoint serving modules
+  - [ ] endpoint serving app icons
+  - [ ] endpoint serving favicons
+  - [ ] endpoint serving spa
 
 ### Configuration
 You can use environment variables to configure the following parameters:
