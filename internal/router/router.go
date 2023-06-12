@@ -20,11 +20,12 @@ func (routerProvider *RouterProvider) CreateRouter() *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 	basePathRouter := router.PathPrefix(configuration.GetBaseURL()).Subrouter()
 
-	cacheClient := createCaheClient(120)
+	cacheClient5sec := createCaheClient(5)
 	feConfigHandleFunc := http.HandlerFunc(routerProvider.FrontendConfigApi.GetMicroFrontendConfigs)
+	feConfigJsHandleFunc := http.HandlerFunc(routerProvider.FrontendConfigApi.GetMicroFrontendConfigsAsJavaScritp)
 
-	basePathRouter.Handle("/fe-config", cacheClient.Middleware(feConfigHandleFunc)).Methods("GET")
-	basePathRouter.HandleFunc("/fe-config.mjs", routerProvider.FrontendConfigApi.GetMicroFrontendConfigsAsJavaScritp).Methods("GET")
+	basePathRouter.Handle("/fe-config", cacheClient5sec.Middleware(feConfigHandleFunc)).Methods("GET")
+	basePathRouter.Handle("/fe-config.mjs", cacheClient5sec.Middleware(feConfigJsHandleFunc)).Methods("GET")
 	router.HandleFunc("/healthz", api.GetHealthInfo).Methods("GET")
 	basePathRouter.HandleFunc("/healthz", api.GetHealthInfo).Methods("GET")
 
