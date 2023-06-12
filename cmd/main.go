@@ -23,8 +23,6 @@ import (
 	"os"
 	"sync"
 
-	"github.com/gorilla/mux"
-
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -43,6 +41,7 @@ import (
 	"github.com/SevcikMichal/microfrontends-controller/internal/configuration"
 	"github.com/SevcikMichal/microfrontends-controller/internal/controller"
 	"github.com/SevcikMichal/microfrontends-controller/internal/provider"
+	"github.com/SevcikMichal/microfrontends-controller/internal/router"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -189,14 +188,11 @@ func startHTTPServer(ctx context.Context, microFrontendProvider *provider.MicroF
 	frontendConfigApi := &api.MicroFrontendConfigApi{
 		MicroFrontendProvider: microFrontendProvider,
 	}
+	routerPorivder := &router.RouterProvider{
+		FrontendConfigApi: frontendConfigApi,
+	}
 
-	router := mux.NewRouter().StrictSlash(true)
-	basePathRouter := router.PathPrefix(configuration.GetBaseURL()).Subrouter()
-
-	basePathRouter.HandleFunc("/fe-config", frontendConfigApi.GetMicroFrontendConfigs).Methods("GET")
-	basePathRouter.HandleFunc("/fe-config.mjs", frontendConfigApi.GetMicroFrontendConfigsAsJavaScritp).Methods("GET")
-	router.HandleFunc("/healthz", api.GetHealthInfo).Methods("GET")
-	basePathRouter.HandleFunc("/healthz", api.GetHealthInfo).Methods("GET")
+	router := routerPorivder.CreateRouter()
 
 	server := &http.Server{
 		Addr:    ":10000",
