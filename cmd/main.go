@@ -130,6 +130,9 @@ func main() {
 		}
 	}
 
+	var apiHealthChecker healthz.Checker = api.CheckHealth
+	mgr.AddHealthzCheck("pingApiServer", apiHealthChecker)
+
 	microFrontendProvider := &provider.MicroFrontendProvider{
 		MicroFrontendTransferStorage: &sync.Map{},
 	}
@@ -188,10 +191,12 @@ func startHTTPServer(ctx context.Context, microFrontendProvider *provider.MicroF
 	}
 
 	router := mux.NewRouter().StrictSlash(true)
-	router = router.PathPrefix(configuration.GetBaseURL()).Subrouter()
+	basePathRouter := router.PathPrefix(configuration.GetBaseURL()).Subrouter()
 
-	router.HandleFunc("/fe-config", frontendConfigApi.GetMicroFrontendConfigs)
-	router.HandleFunc("/fe-config.mjs", frontendConfigApi.GetMicroFrontendConfigsAsJavaScritp)
+	basePathRouter.HandleFunc("/fe-config", frontendConfigApi.GetMicroFrontendConfigs).Methods("GET")
+	basePathRouter.HandleFunc("/fe-config.mjs", frontendConfigApi.GetMicroFrontendConfigsAsJavaScritp).Methods("GET")
+	router.HandleFunc("/healthz", api.GetHealthInfo).Methods("GET")
+	basePathRouter.HandleFunc("/healthz", api.GetHealthInfo).Methods("GET")
 
 	server := &http.Server{
 		Addr:    ":10000",

@@ -24,7 +24,7 @@ Here is a list of functionality that is provided by the original ufe-controller 
 - [x] An operator observing specific CRs either on specific namespaces or in all
 - [x] endpoint serving the MicroFrontendConfiguration as JSON (`/fe-config`)
 - [x] endpoint serving the MicroFrontendConfiguration as JavaScript (`/fe-config.mjs`)
-- [ ] endpoint serving healthcheck for API server
+- [x] endpoint serving healthcheck for API server (`/healthz`)
 - [ ] endpoint serving webcomponents
 ---
 - [ ] Include fronted part
