@@ -44,7 +44,7 @@ func (api *MicroFrontendConfigApi) GetMicroFrontendConfigs(w http.ResponseWriter
 		*frontendConfig.Anonymous = true
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	json.NewEncoder(w).Encode(frontendConfig)
 }
 
@@ -69,7 +69,7 @@ func (api *MicroFrontendConfigApi) GetMicroFrontendConfigsAsJavaScritp(w http.Re
 
 	frontendConfigJavaScript := "self.feConfig = " + string(frontendConfigJson) + ";"
 
-	w.Header().Set("Content-Type", "text/javascript")
+	w.Header().Set("Content-Type", "text/javascript; charset=utf-8")
 	w.Write([]byte(frontendConfigJavaScript))
 }
 
