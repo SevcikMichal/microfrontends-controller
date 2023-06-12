@@ -145,9 +145,7 @@ spec:
                         url:
                           type: string
                       required:
-                      - data
                       - mime
-                      - url
                       type: object
                     path:
                       description: By navigating to the specific subpath, the app

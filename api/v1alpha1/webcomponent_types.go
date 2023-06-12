@@ -128,7 +128,7 @@ type Navigation struct {
 
 	// The optional icon is associated with the navigable component. SVG format is preferred. Either the data property should provide base64 encoded icon/image data or the url to the image source should be specified. The mime property must specify the proper MIME type of the icon/image.
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
-	Icon Icon `json:"icon,omitempty"`
+	Icon *Icon `json:"icon,omitempty"`
 
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
 	Roles []string `json:"roles,omitempty"`
@@ -140,11 +140,11 @@ type Icon struct {
 
 	// +kubebuilder:Validation:Format=byte
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
-	Data string `json:"data"`
+	Data string `json:"data,omitempty"`
 
 	// +kubebuilder:Validation:Format=url
 	// +operator-sdk:csv:customresourcedefinitions:type=spec
-	Url string `json:"url"`
+	Url string `json:"url,omitempty"`
 }
 
 // WebComponentStatus defines the observed state of WebComponent
