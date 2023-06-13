@@ -108,7 +108,11 @@ func (in *Navigation) DeepCopyInto(out *Navigation) {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
-	out.Icon = in.Icon
+	if in.Icon != nil {
+		in, out := &in.Icon, &out.Icon
+		*out = new(Icon)
+		**out = **in
+	}
 	if in.Roles != nil {
 		in, out := &in.Roles, &out.Roles
 		*out = make([]string, len(*in))
