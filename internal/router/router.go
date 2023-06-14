@@ -14,6 +14,7 @@ import (
 
 type RouterProvider struct {
 	FrontendConfigApi *api.MicroFrontendConfigApi
+	WebComponentApi   *api.WebComponentApi
 }
 
 func (routerProvider *RouterProvider) CreateRouter() *mux.Router {
@@ -21,13 +22,20 @@ func (routerProvider *RouterProvider) CreateRouter() *mux.Router {
 	basePathRouter := router.PathPrefix(configuration.GetBaseURL()).Subrouter()
 
 	cacheClient5sec := createCaheClient(5)
+
+	// Frontend config handlers
 	feConfigHandleFunc := http.HandlerFunc(routerProvider.FrontendConfigApi.GetMicroFrontendConfigs)
 	feConfigJsHandleFunc := http.HandlerFunc(routerProvider.FrontendConfigApi.GetMicroFrontendConfigsAsJavaScritp)
-
 	basePathRouter.Handle("/fe-config", cacheClient5sec.Middleware(feConfigHandleFunc)).Methods("GET")
 	basePathRouter.Handle("/fe-config.mjs", cacheClient5sec.Middleware(feConfigJsHandleFunc)).Methods("GET")
+
+	// Health check handlers
 	router.HandleFunc("/healthz", api.GetHealthInfo).Methods("GET")
 	basePathRouter.HandleFunc("/healthz", api.GetHealthInfo).Methods("GET")
+
+	// Web component handlers
+	webComponentHandleFunc := http.HandlerFunc(routerProvider.WebComponentApi.GetWebComponent)
+	basePathRouter.PathPrefix("/web-components").Handler(webComponentHandleFunc).Methods("GET")
 
 	return router
 }
