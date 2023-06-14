@@ -26,7 +26,7 @@ Here is a list of functionality that is provided by the original ufe-controller 
 - [x] endpoint serving the MicroFrontendConfiguration as JavaScript (`/fe-config.mjs`)
 - [x] endpoint serving healthcheck for API server (`/healthz`)
 - [x] implement caching of responses
-- [ ] endpoint serving webcomponents
+- [x] endpoint serving webcomponents (`/web-components`)
 ---
 - [ ] Include fronted part
   - [ ] endpoint serving manifest

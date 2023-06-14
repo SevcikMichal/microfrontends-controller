@@ -133,6 +133,7 @@ func main() {
 	mgr.AddHealthzCheck("pingApiServer", apiHealthChecker)
 
 	microFrontendProvider := &provider.MicroFrontendProvider{
+		MicroFrontendModelStorage:    &sync.Map{},
 		MicroFrontendTransferStorage: &sync.Map{},
 	}
 
@@ -188,8 +189,15 @@ func startHTTPServer(ctx context.Context, microFrontendProvider *provider.MicroF
 	frontendConfigApi := &api.MicroFrontendConfigApi{
 		MicroFrontendProvider: microFrontendProvider,
 	}
+
+	webComponentApi := &api.WebComponentApi{
+		MicroFrontendProvider: microFrontendProvider,
+		Client:                &http.Client{},
+	}
+
 	routerPorivder := &router.RouterProvider{
 		FrontendConfigApi: frontendConfigApi,
+		WebComponentApi:   webComponentApi,
 	}
 
 	router := routerPorivder.CreateRouter()

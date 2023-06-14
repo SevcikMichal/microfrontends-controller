@@ -33,6 +33,7 @@ const (
 )
 
 type MicroFrontendProvider struct {
+	MicroFrontendModelStorage    *sync.Map
 	MicroFrontendTransferStorage *sync.Map
 }
 
@@ -40,12 +41,14 @@ func (r *MicroFrontendProvider) SetMicroFrontendConfig(key types.UID, microFront
 	r.updateWebAppTransfers(key, microFrontendConfig)
 	r.updatePreloadTransfers(key, microFrontendConfig)
 	r.updateContextTransfers(key, microFrontendConfig)
+	r.MicroFrontendModelStorage.Store(key, microFrontendConfig)
 }
 
 func (r *MicroFrontendProvider) DeleteMicroFrontendConfig(key types.UID) {
 	r.deleteWebAppTransfers(key)
 	r.deletePreloadTransfers(key)
 	r.deleteContextTransfers(key)
+	r.MicroFrontendModelStorage.Delete(key)
 }
 
 func (r *MicroFrontendProvider) GetMicroFrontendConfigTransfer() *contract.MicroFrontendConfigurationTransfer {
@@ -57,4 +60,30 @@ func (r *MicroFrontendProvider) GetMicroFrontendConfigTransfer() *contract.Micro
 	}
 
 	return frontendConfigTransfer
+}
+
+func (r *MicroFrontendProvider) GetMicrofrontendModuleUri(webComponentNamespace string, webComponentName string) string {
+	var moduleUri string
+	r.MicroFrontendModelStorage.Range(func(key, value interface{}) bool {
+		microFrontendConfig := value.(*model.MicroFrontendConfig)
+		if microFrontendConfig.MicroFrontendNamespace == webComponentNamespace && microFrontendConfig.MicroFrontendName == webComponentName {
+			moduleUri = microFrontendConfig.ModuleUri
+			return false
+		}
+		return true
+	})
+	return moduleUri
+}
+
+func (r *MicroFrontendProvider) GetMicrofrontendRequestModuleUri(webComponentNamespace string, webComponentName string) string {
+	var moduleUri string
+	r.MicroFrontendModelStorage.Range(func(key, value interface{}) bool {
+		microFrontendConfig := value.(*model.MicroFrontendConfig)
+		if microFrontendConfig.MicroFrontendNamespace == webComponentNamespace && microFrontendConfig.MicroFrontendName == webComponentName {
+			moduleUri = microFrontendConfig.ExtractModuleUri()
+			return false
+		}
+		return true
+	})
+	return moduleUri
 }

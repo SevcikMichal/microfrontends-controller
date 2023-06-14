@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: msevcik-ambulance-ufe-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+        pod: msevcik-ambulance-ufe-label
+  template:
+    metadata:
+      labels: 
+        pod: msevcik-ambulance-ufe-label
+    spec:
+      containers:
+      - name: msevcik-ambulance-ufe-container
+        image: msevcik/ambulance-ufe-demo:1.0.0-41
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 80
+        resources:                   
+            requests:               
+                memory: "32M"
+                cpu: "0.1"
+            limits:
+                memory: "320M"
+                cpu: "0.3"
