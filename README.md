@@ -27,6 +27,7 @@ Here is a list of functionality that is provided by the original ufe-controller 
 - [x] endpoint serving healthcheck for API server (`/healthz`)
 - [x] implement caching of responses
 - [x] endpoint serving webcomponents (`/web-components`)
+- [ ] endopint serving app icons
 ---
 - [ ] Include fronted part
   - [ ] endpoint serving manifest
@@ -34,7 +35,6 @@ Here is a list of functionality that is provided by the original ufe-controller 
   - [ ] endpoint serving assets
   - [ ] endpoint serving fonts
   - [ ] endpoint serving modules
-  - [ ] endpoint serving app icons
   - [ ] endpoint serving favicons
   - [ ] endpoint serving spa
 
