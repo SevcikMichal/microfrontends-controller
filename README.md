@@ -27,6 +27,7 @@ Here is a list of functionality that is provided by the original ufe-controller 
 - [x] endpoint serving healthcheck for API server (`/healthz`)
 - [x] implement caching of responses
 - [x] endpoint serving webcomponents (`/web-components`)
+- [ ] endopint serving app icons
 ---
 - [ ] Include fronted part
   - [ ] endpoint serving manifest
@@ -34,7 +35,6 @@ Here is a list of functionality that is provided by the original ufe-controller 
   - [ ] endpoint serving assets
   - [ ] endpoint serving fonts
   - [ ] endpoint serving modules
-  - [ ] endpoint serving app icons
   - [ ] endpoint serving favicons
   - [ ] endpoint serving spa
 
@@ -48,6 +48,7 @@ You can use environment variables to configure the following parameters:
 |USER_NAME_HEADER|x-forwarded-user|incomming request`s header name (lowercase) specifying the user name|
 |USER_ROLES_HEADER|x-forwarded-groups|incomming request`s header name (lowercase) specifying the list of user roles (or groups)|
 |WEBCOMPONENTS_SELECTOR||comma separate list of key-value pairs, used to filter WebComponent resources handled by this controller|
+|HTTP_PORT|80|port on which the HTTP server listens|
 
 ## Getting Started
 You’ll need a Kubernetes cluster to run against. You can use [KIND](https://sigs.k8s.io/kind) to get a local cluster for testing, or run against a remote cluster.
@@ -74,7 +75,7 @@ kubect apply -k config/samples/namespaced
 
 3. Run a debug session using included debug configurations in `.vscode/launch.json` there is one for observing all namespaces and one where you can limit the observed namespaces.
 
-4. Call `localhost:10000\fe-config` to get the MicroFrontendConfigurations created from the CRs.
+4. Call `localhost:<port-default-80>\fe-config` to get the MicroFrontendConfigurations created from the CRs.
 ### Delete CRs
 To delete the CRs from the cluster and see the delete logic in the controller:
 ```sh

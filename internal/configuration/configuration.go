@@ -83,7 +83,13 @@ func GetHttpCspHeader() string {
 }
 
 func GetHttpPort() string {
-	return os.Getenv(HttpPort)
+	value, ok := os.LookupEnv(HttpPort)
+
+	if ok {
+		return value
+	}
+
+	return "80"
 }
 
 func GetManifestTemplate() string {

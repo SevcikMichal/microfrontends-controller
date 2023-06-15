@@ -45,7 +45,7 @@ spec:
         - --leader-elect
         image: controller:latest
         ports:
-        - containerPort: 10000
+        - containerPort: 80 # update port based on HTTP_PORT configuration
         name: manager
         securityContext:
           allowPrivilegeEscalation: false

@@ -11,6 +11,7 @@
             "mode": "auto",
             "program": "${workspaceFolder}/cmd/main.go",
             "env": {
+                //"HTTP_PORT": "10000",
                 //"BASE_URL": "/ui",
             }
         },
