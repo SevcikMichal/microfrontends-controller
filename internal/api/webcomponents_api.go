@@ -23,6 +23,11 @@ func (api *WebComponentApi) GetWebComponent(w http.ResponseWriter, r *http.Reque
 	requestModuleUri := api.MicroFrontendProvider.GetMicrofrontendRequestModuleUri(namespace, name)
 	realModuleUri := api.MicroFrontendProvider.GetMicrofrontendModuleUri(namespace, name)
 
+	if requestModuleUri == "" || realModuleUri == "" {
+		http.NotFound(w, r)
+		return
+	}
+
 	proxyUrl := realModuleUri
 	if requestModuleUri != r.URL.Path {
 		proxyUrl = addResourceToLastUrlSegment(realModuleUri, resource)
@@ -30,6 +35,7 @@ func (api *WebComponentApi) GetWebComponent(w http.ResponseWriter, r *http.Reque
 
 	req, err := http.NewRequest("GET", proxyUrl, r.Body)
 	if err != nil {
+		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -37,6 +43,7 @@ func (api *WebComponentApi) GetWebComponent(w http.ResponseWriter, r *http.Reque
 	log.Println("Proxying request to the module.", "Resolved URL:", proxyUrl)
 	resp, err := api.Client.Do(req)
 	if err != nil {
+		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -62,8 +69,6 @@ func addResourceToLastUrlSegment(urlPath, resource string) string {
 
 func copyHeaders(dst, src http.Header) {
 	for key, values := range src {
-		for _, value := range values {
-			dst.Add(key, value)
-		}
+		dst.Set(key, strings.Join(values, ", "))
 	}
 }

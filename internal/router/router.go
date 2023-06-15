@@ -1,15 +1,18 @@
 package router
 
 import (
-	"fmt"
 	"net/http"
+	"net/http/httptest"
+	"strings"
 	"time"
 
 	"github.com/SevcikMichal/microfrontends-controller/internal/api"
 	"github.com/SevcikMichal/microfrontends-controller/internal/configuration"
 	"github.com/gorilla/mux"
-	cache "github.com/victorspringer/http-cache"
-	"github.com/victorspringer/http-cache/adapter/memory"
+)
+
+const (
+	lookupWebComponentKeyWord = "lookup-web-component"
 )
 
 type RouterProvider struct {
@@ -21,13 +24,11 @@ func (routerProvider *RouterProvider) CreateRouter() *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 	basePathRouter := router.PathPrefix(configuration.GetBaseURL()).Subrouter()
 
-	cacheClient5sec := createCaheClient(5)
-
 	// Frontend config handlers
 	feConfigHandleFunc := http.HandlerFunc(routerProvider.FrontendConfigApi.GetMicroFrontendConfigs)
 	feConfigJsHandleFunc := http.HandlerFunc(routerProvider.FrontendConfigApi.GetMicroFrontendConfigsAsJavaScritp)
-	basePathRouter.Handle("/fe-config", cacheClient5sec.Middleware(feConfigHandleFunc)).Methods("GET")
-	basePathRouter.Handle("/fe-config.mjs", cacheClient5sec.Middleware(feConfigJsHandleFunc)).Methods("GET")
+	basePathRouter.Handle("/fe-config", routerProvider.cache("30", routerProvider.FrontendConfigApi.MicroFrontendProvider.GetETag, feConfigHandleFunc)).Methods("GET")
+	basePathRouter.Handle("/fe-config.mjs", routerProvider.cache("30", routerProvider.FrontendConfigApi.MicroFrontendProvider.GetETag, feConfigJsHandleFunc)).Methods("GET")
 
 	// Health check handlers
 	router.HandleFunc("/healthz", api.GetHealthInfo).Methods("GET")
@@ -35,28 +36,46 @@ func (routerProvider *RouterProvider) CreateRouter() *mux.Router {
 
 	// Web component handlers
 	webComponentHandleFunc := http.HandlerFunc(routerProvider.WebComponentApi.GetWebComponent)
-	basePathRouter.PathPrefix("/web-components").Handler(webComponentHandleFunc).Methods("GET")
+	basePathRouter.PathPrefix("/web-components").Handler(routerProvider.cache("3600", func() string {
+		return lookupWebComponentKeyWord // Dirty hack to be able to fetch it here so that we don't need to duplicate the code in api
+	}, webComponentHandleFunc)).Methods("GET")
 
 	return router
 }
 
-func createCaheClient(timeToLiveInSeconds int) *cache.Client {
-	memcached, err := memory.NewAdapter(
-		memory.AdapterWithAlgorithm(memory.LRU),
-		memory.AdapterWithCapacity(10000000),
-	)
-	if err != nil {
-		panic(err)
-	}
+func (routerProvider *RouterProvider) cache(durationInSeconds string, eTagGetter func() string, handler func(w http.ResponseWriter, r *http.Request)) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		eTag := eTagGetter()
 
-	cacheClient, err := cache.NewClient(
-		cache.ClientWithAdapter(memcached),
-		cache.ClientWithTTL(time.Duration(timeToLiveInSeconds)*time.Second),
-	)
+		// Dirty hack to be able to fetch it here so that we don't need to duplicate the code in api
+		if eTag == lookupWebComponentKeyWord {
+			segments := strings.Split(r.URL.Path, "/")
+			namespace, name := segments[2], segments[3]
+			eTag = routerProvider.FrontendConfigApi.MicroFrontendProvider.GetMicrofrontendHashSuffix(namespace, name)
+		}
 
-	if err != nil {
-		fmt.Println(err)
-		panic(err)
-	}
-	return cacheClient
+		if r.Header.Get("Cache-Control") != "no-cache" && r.Header.Get("If-None-Match") == eTag {
+			w.Header().Set("Cache-Control", "max-age="+durationInSeconds)
+			w.Header().Set("Last-Modified", r.Header.Get("Last-Modified"))
+			w.Header().Set("ETag", eTag)
+			w.WriteHeader(http.StatusNotModified)
+			return
+		}
+
+		c := httptest.NewRecorder()
+		handler(c, r)
+
+		for k, v := range c.Header() {
+			w.Header().Set(k, strings.Join(v, ", "))
+		}
+
+		w.Header().Set("Cache-Control", "max-age="+durationInSeconds)
+		w.Header().Set("Last-Modified", time.Now().Format(time.RFC1123))
+		w.Header().Set("ETag", eTag)
+
+		w.WriteHeader(c.Code)
+		content := c.Body.Bytes()
+
+		w.Write(content)
+	})
 }
