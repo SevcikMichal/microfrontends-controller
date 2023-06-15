@@ -51,7 +51,6 @@ func (api *WebComponentApi) GetWebComponent(w http.ResponseWriter, r *http.Reque
 
 	copyHeaders(w.Header(), resp.Header)
 	w.Header().Set("Content-Type", "application/javascript")
-	w.Header().Set("WebComponent-Hash-Suffix", api.MicroFrontendProvider.GetMicrofrontendHashSuffix(namespace, name))
 
 	w.WriteHeader(resp.StatusCode)
 	io.Copy(w, resp.Body)
