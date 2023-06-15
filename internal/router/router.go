@@ -73,10 +73,6 @@ func (routerProvider *RouterProvider) cache(durationInSeconds string, eTagGetter
 		w.Header().Set("Last-Modified", time.Now().Format(time.RFC1123))
 		w.Header().Set("ETag", eTag)
 
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-
 		w.WriteHeader(c.Code)
 		content := c.Body.Bytes()
 
