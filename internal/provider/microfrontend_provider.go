@@ -19,7 +19,9 @@ package provider
 // TODO: Improve the implementation of MicroFrontendProvider currently it is not very sofiticated
 
 import (
+	"strconv"
 	"sync"
+	"time"
 
 	"github.com/SevcikMichal/microfrontends-controller/contract"
 	"github.com/SevcikMichal/microfrontends-controller/internal/model"
@@ -35,6 +37,7 @@ const (
 type MicroFrontendProvider struct {
 	MicroFrontendModelStorage    *sync.Map
 	MicroFrontendTransferStorage *sync.Map
+	eTag                         string
 }
 
 func (r *MicroFrontendProvider) SetMicroFrontendConfig(key types.UID, microFrontendConfig *model.MicroFrontendConfig) {
@@ -42,6 +45,7 @@ func (r *MicroFrontendProvider) SetMicroFrontendConfig(key types.UID, microFront
 	r.updatePreloadTransfers(key, microFrontendConfig)
 	r.updateContextTransfers(key, microFrontendConfig)
 	r.MicroFrontendModelStorage.Store(key, microFrontendConfig)
+	r.eTag = strconv.Itoa(time.Now().Nanosecond())
 }
 
 func (r *MicroFrontendProvider) DeleteMicroFrontendConfig(key types.UID) {
@@ -49,6 +53,7 @@ func (r *MicroFrontendProvider) DeleteMicroFrontendConfig(key types.UID) {
 	r.deletePreloadTransfers(key)
 	r.deleteContextTransfers(key)
 	r.MicroFrontendModelStorage.Delete(key)
+	r.eTag = strconv.Itoa(time.Now().Nanosecond())
 }
 
 func (r *MicroFrontendProvider) GetMicroFrontendConfigTransfer() *contract.MicroFrontendConfigurationTransfer {
@@ -62,12 +67,12 @@ func (r *MicroFrontendProvider) GetMicroFrontendConfigTransfer() *contract.Micro
 	return frontendConfigTransfer
 }
 
-func (r *MicroFrontendProvider) GetMicrofrontendModuleUri(webComponentNamespace string, webComponentName string) string {
+func (r *MicroFrontendProvider) getMicrofrontendUri(webComponentNamespace string, webComponentName string, getField func(*model.MicroFrontendConfig) string) string {
 	var moduleUri string
 	r.MicroFrontendModelStorage.Range(func(key, value interface{}) bool {
 		microFrontendConfig := value.(*model.MicroFrontendConfig)
 		if microFrontendConfig.MicroFrontendNamespace == webComponentNamespace && microFrontendConfig.MicroFrontendName == webComponentName {
-			moduleUri = microFrontendConfig.ModuleUri
+			moduleUri = getField(microFrontendConfig)
 			return false
 		}
 		return true
@@ -75,15 +80,24 @@ func (r *MicroFrontendProvider) GetMicrofrontendModuleUri(webComponentNamespace 
 	return moduleUri
 }
 
-func (r *MicroFrontendProvider) GetMicrofrontendRequestModuleUri(webComponentNamespace string, webComponentName string) string {
-	var moduleUri string
-	r.MicroFrontendModelStorage.Range(func(key, value interface{}) bool {
-		microFrontendConfig := value.(*model.MicroFrontendConfig)
-		if microFrontendConfig.MicroFrontendNamespace == webComponentNamespace && microFrontendConfig.MicroFrontendName == webComponentName {
-			moduleUri = microFrontendConfig.ExtractModuleUri()
-			return false
-		}
-		return true
+func (r *MicroFrontendProvider) GetMicrofrontendModuleUri(webComponentNamespace string, webComponentName string) string {
+	return r.getMicrofrontendUri(webComponentNamespace, webComponentName, func(config *model.MicroFrontendConfig) string {
+		return config.ModuleUri
 	})
-	return moduleUri
+}
+
+func (r *MicroFrontendProvider) GetMicrofrontendRequestModuleUri(webComponentNamespace string, webComponentName string) string {
+	return r.getMicrofrontendUri(webComponentNamespace, webComponentName, func(config *model.MicroFrontendConfig) string {
+		return config.ExtractModuleUri()
+	})
+}
+
+func (r *MicroFrontendProvider) GetETag() string {
+	return r.eTag
+}
+
+func (r *MicroFrontendProvider) GetMicrofrontendHashSuffix(webComponentNamespace string, webComponentName string) string {
+	return r.getMicrofrontendUri(webComponentNamespace, webComponentName, func(config *model.MicroFrontendConfig) string {
+		return config.HashSuffix
+	})
 }
