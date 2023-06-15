@@ -3,6 +3,8 @@ package api
 import (
 	"log"
 	"net/http"
+
+	"github.com/SevcikMichal/microfrontends-controller/internal/configuration"
 )
 
 // Currently only returns ok to check if the API server is listening
@@ -12,6 +14,6 @@ func GetHealthInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func CheckHealth(r *http.Request) error {
-	_, err := http.Get("http://localhost:10000/healthz")
+	_, err := http.Get("http://localhost:" + configuration.GetHttpPort() + "/healthz")
 	return err
 }

@@ -203,7 +203,7 @@ func startHTTPServer(ctx context.Context, microFrontendProvider *provider.MicroF
 	router := routerPorivder.CreateRouter()
 
 	server := &http.Server{
-		Addr:    ":10000",
+		Addr:    ":" + configuration.GetHttpPort(),
 		Handler: router,
 	}
 
