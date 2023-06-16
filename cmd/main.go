@@ -195,9 +195,14 @@ func startHTTPServer(ctx context.Context, microFrontendProvider *provider.MicroF
 		Client:                &http.Client{},
 	}
 
+	appIconsApi := &api.AppIconsApi{
+		MicroFrontendProvider: microFrontendProvider,
+	}
+
 	routerPorivder := &router.RouterProvider{
 		FrontendConfigApi: frontendConfigApi,
 		WebComponentApi:   webComponentApi,
+		AppIconsApi:       appIconsApi,
 	}
 
 	router := routerPorivder.CreateRouter()

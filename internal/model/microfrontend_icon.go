@@ -16,6 +16,8 @@ limitations under the License.
 
 package model
 
+import "strings"
+
 type MicroFrontendIcon struct {
 	Mime string `json:"mime"`
 	Data string `json:"data"`
@@ -25,5 +27,10 @@ type MicroFrontendIcon struct {
 func (icon *MicroFrontendIcon) ExtractIconPath(iconPath string) string {
 	appIconUri := RebaseUri("/app-icons/")
 	iconUrl := appIconUri + iconPath
+
+	if strings.HasSuffix(iconUrl, "/") {
+		iconUrl, _ = strings.CutSuffix(iconUrl, "/")
+	}
+
 	return iconUrl
 }

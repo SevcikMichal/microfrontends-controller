@@ -101,3 +101,19 @@ func (r *MicroFrontendProvider) GetMicrofrontendHashSuffix(webComponentNamespace
 		return config.HashSuffix
 	})
 }
+
+func (r *MicroFrontendProvider) GetMicrofrontendAppIcon(navigationPath string) *model.MicroFrontendIcon {
+	var icon *model.MicroFrontendIcon
+	r.MicroFrontendModelStorage.Range(func(key, value interface{}) bool {
+		microFrontendConfig := value.(*model.MicroFrontendConfig)
+		for _, navigation := range microFrontendConfig.Navigations {
+			if navigation.Path == navigationPath {
+				icon = navigation.Icon
+				return true
+			}
+		}
+		return true
+	})
+
+	return icon
+}

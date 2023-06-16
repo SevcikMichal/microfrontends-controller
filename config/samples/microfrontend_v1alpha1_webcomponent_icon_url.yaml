@@ -1,0 +1,22 @@
+apiVersion: microfrontend.michalsevcik.dev/v1alpha1
+kind: WebComponent
+metadata: 
+  name: ambulance-ufe-icon-url
+spec:   
+  module-uri: http://ambulance-ufe.wac-hospital/build/ambulance-list.esm.js
+  navigations:
+    - element: ambulance-wl-app-url
+      path: ambulance-wl-icon-url
+      title: Zoznam čakajúcich
+      details:  Zapíšte sa do poradovníka pacientov čakajúcich na vyšetrenie u MuDr. Bobulová
+      attributes:
+        - name: api-uri
+          value: /waiting-list-api
+        - name: ambulance
+          value: bobulova
+      icon: 
+        mime: image/svg+xml
+        url: https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/check_circle/default/48px.svg
+  preload: false
+  proxy: true
+  hash-suffix: v1alpha2
