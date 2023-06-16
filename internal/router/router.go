@@ -1,6 +1,8 @@
 package router
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -13,11 +15,13 @@ import (
 
 const (
 	lookupWebComponentKeyWord = "lookup-web-component"
+	contentHashKeyWord        = "content-hash"
 )
 
 type RouterProvider struct {
 	FrontendConfigApi *api.MicroFrontendConfigApi
 	WebComponentApi   *api.WebComponentApi
+	AppIconsApi       *api.AppIconsApi
 }
 
 func (routerProvider *RouterProvider) CreateRouter() *mux.Router {
@@ -40,6 +44,12 @@ func (routerProvider *RouterProvider) CreateRouter() *mux.Router {
 		return lookupWebComponentKeyWord // Dirty hack to be able to fetch it here so that we don't need to duplicate the code in api
 	}, webComponentHandleFunc)).Methods("GET")
 
+	// App icon handlers
+	appIconHandleFunc := http.HandlerFunc(routerProvider.AppIconsApi.GetAppIcon)
+	basePathRouter.PathPrefix("/app-icons").Handler(routerProvider.cache("604800", func() string {
+		return contentHashKeyWord // Dirty hack to calculate hash from content
+	}, appIconHandleFunc)).Methods("GET")
+
 	return router
 }
 
@@ -52,6 +62,16 @@ func (routerProvider *RouterProvider) cache(durationInSeconds string, eTagGetter
 			segments := strings.Split(r.URL.Path, "/")
 			namespace, name := segments[2], segments[3]
 			eTag = routerProvider.FrontendConfigApi.MicroFrontendProvider.GetMicrofrontendHashSuffix(namespace, name)
+		}
+
+		// Dirty hack to calculate hash from content
+		if eTag == contentHashKeyWord {
+			segments := strings.Split(r.URL.Path, "/")
+			navigationPath := strings.Join(segments[(len(segments)-1):], "/")
+			appIcon := routerProvider.FrontendConfigApi.MicroFrontendProvider.GetMicrofrontendAppIcon(navigationPath)
+			hash := md5.Sum([]byte(appIcon.Data))
+			hashStr := hex.EncodeToString(hash[:])
+			eTag = hashStr
 		}
 
 		if r.Header.Get("Cache-Control") != "no-cache" && r.Header.Get("If-None-Match") == eTag {
