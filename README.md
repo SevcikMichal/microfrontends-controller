@@ -19,24 +19,9 @@ WebComponentController is reconciling the WebComponent CRs. Currently, it is app
 
 The API server simply takes the last snapshot of the in-memory storage and returns it to the frontend.
 
-### Migration TODO list:
-Here is a list of functionality that is provided by the original ufe-controller and whit information of what is implemented in the go alternative:
-- [x] An operator observing specific CRs either on specific namespaces or in all
-- [x] endpoint serving the MicroFrontendConfiguration as JSON (`/fe-config`)
-- [x] endpoint serving the MicroFrontendConfiguration as JavaScript (`/fe-config.mjs`)
-- [x] endpoint serving healthcheck for API server (`/healthz`)
-- [x] implement caching of responses
-- [x] endpoint serving webcomponents (`/web-components`)
-- [x] endopint serving app icons (`/app-icons`)
----
-- [ ] Include fronted part
-  - [ ] endpoint serving manifest
-  - [ ] endpoint serving service worker
-  - [ ] endpoint serving assets
-  - [ ] endpoint serving fonts
-  - [ ] endpoint serving modules
-  - [ ] endpoint serving favicons
-  - [ ] endpoint serving spa
+### Example Front End using the WebComponents
+
+The original repo of ufe-controller contained both backend and an sample web ui. For this project we decided to separate UI and backend into two separate projects. The UI sample using this backend is located here: https://github.com/SevcikMichal/microfrontends-webui
 
 ### Configuration
 You can use environment variables to configure the following parameters:
