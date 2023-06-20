@@ -8,6 +8,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/SevcikMichal/microfrontends-controller/internal/model"
 	"github.com/SevcikMichal/microfrontends-controller/internal/provider"
 )
 
@@ -29,7 +30,7 @@ func (api *WebComponentApi) GetWebComponent(w http.ResponseWriter, r *http.Reque
 	}
 
 	proxyUrl := realModuleUri
-	if requestModuleUri != r.URL.Path {
+	if requestModuleUri != model.RebaseUri(r.URL.Path) {
 		proxyUrl = addResourceToLastUrlSegment(realModuleUri, resource)
 	}
 

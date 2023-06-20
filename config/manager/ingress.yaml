@@ -11,7 +11,7 @@ spec:
   rules:
   - http:
       paths:
-      - path: /microfrontends(/|$)(.*)
+      - path: /microfrontends-ui(/|$)(.*)
         pathType: Prefix
         backend:
           service:
