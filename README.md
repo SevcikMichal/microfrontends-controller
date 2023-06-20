@@ -40,6 +40,8 @@ You’ll need a Kubernetes cluster to run against. You can use [KIND](https://si
 
 > Your controller will automatically use the current context in your kubeconfig file (i.e. whatever cluster `kubectl cluster-info` shows).
 
+> Controller is currently expecting ingess-nginx to be installed in the cluster. This is used to create the ingress for the controller. If you have different ingress controller you can modify the controller to use that one in config/manager/ingress.yaml.
+
 ### Running locally
 > This will still require a cluster where the CRs will be stored only the processing part will run from your code. Allowing debuging etc.
 1. Install CRD into your local cluster
