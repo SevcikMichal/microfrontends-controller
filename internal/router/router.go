@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/SevcikMichal/microfrontends-controller/internal/api"
-	"github.com/SevcikMichal/microfrontends-controller/internal/configuration"
 	"github.com/gorilla/mux"
 )
 
@@ -26,7 +25,7 @@ type RouterProvider struct {
 
 func (routerProvider *RouterProvider) CreateRouter() *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
-	basePathRouter := router.PathPrefix(configuration.GetBaseURL()).Subrouter()
+	basePathRouter := router.PathPrefix("/").Subrouter()
 
 	// Frontend config handlers
 	feConfigHandleFunc := http.HandlerFunc(routerProvider.FrontendConfigApi.GetMicroFrontendConfigs)
