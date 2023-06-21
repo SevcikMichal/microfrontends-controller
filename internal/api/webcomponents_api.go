@@ -8,7 +8,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/SevcikMichal/microfrontends-controller/internal/model"
+	"github.com/SevcikMichal/microfrontends-controller/internal/configuration"
 	"github.com/SevcikMichal/microfrontends-controller/internal/provider"
 )
 
@@ -30,7 +30,7 @@ func (api *WebComponentApi) GetWebComponent(w http.ResponseWriter, r *http.Reque
 	}
 
 	proxyUrl := realModuleUri
-	if requestModuleUri != model.RebaseUri(r.URL.Path) {
+	if requestModuleUri != r.URL.Path {
 		proxyUrl = addResourceToLastUrlSegment(realModuleUri, resource)
 	}
 
@@ -58,8 +58,9 @@ func (api *WebComponentApi) GetWebComponent(w http.ResponseWriter, r *http.Reque
 }
 
 func parseWebComponentPath(path string) (namespace, name, resource string) {
-	segments := strings.Split(path, "/")
-	return segments[2], segments[3], strings.Join(segments[4:], "/")
+	temp, _ := strings.CutPrefix(path, configuration.GetBaseURL())
+	segments := strings.Split(temp, "/")
+	return segments[1], segments[2], strings.Join(segments[3:], "/")
 }
 
 func addResourceToLastUrlSegment(urlPath, resource string) string {
