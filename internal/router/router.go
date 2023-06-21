@@ -3,12 +3,15 @@ package router
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"io"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"time"
 
 	"github.com/SevcikMichal/microfrontends-controller/internal/api"
+	"github.com/SevcikMichal/microfrontends-controller/internal/configuration"
 	"github.com/gorilla/mux"
 )
 
@@ -25,7 +28,7 @@ type RouterProvider struct {
 
 func (routerProvider *RouterProvider) CreateRouter() *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
-	basePathRouter := router.PathPrefix("/").Subrouter()
+	basePathRouter := router.PathPrefix(configuration.GetBaseURL()).Subrouter()
 
 	// Frontend config handlers
 	feConfigHandleFunc := http.HandlerFunc(routerProvider.FrontendConfigApi.GetMicroFrontendConfigs)
@@ -48,6 +51,8 @@ func (routerProvider *RouterProvider) CreateRouter() *mux.Router {
 	basePathRouter.PathPrefix("/app-icons").Handler(routerProvider.cache("604800", func() string {
 		return contentHashKeyWord // Dirty hack to calculate hash from content
 	}, appIconHandleFunc)).Methods("GET")
+
+	basePathRouter.PathPrefix("/").HandlerFunc(passThrough).Methods("GET")
 
 	return router
 }
@@ -97,4 +102,37 @@ func (routerProvider *RouterProvider) cache(durationInSeconds string, eTagGetter
 
 		w.Write(content)
 	})
+}
+
+func passThrough(w http.ResponseWriter, r *http.Request) {
+	log.Println("Request did not match any endpoint passing to web ui.")
+	path := r.URL.Path
+
+	req, err := http.NewRequest("GET", "http://localhost:8082"+path, r.Body) // TODO: Read from config
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	log.Println("Proxying request to resolved URL.", "Resolved URL:", "http://localhost:8082"+path) // TODO: Read from config
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+
+	copyHeaders(w.Header(), resp.Header)
+
+	w.WriteHeader(resp.StatusCode)
+	io.Copy(w, resp.Body)
+}
+
+func copyHeaders(dst, src http.Header) {
+	for key, values := range src {
+		dst.Set(key, strings.Join(values, ", "))
+	}
 }
