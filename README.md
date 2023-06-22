@@ -32,8 +32,9 @@ You can use environment variables to configure the following parameters:
 |USER_ID_HEADER|x-forwarded-email|incomming request`s header name (lowercase) specifying the user identifier, typically email|
 |USER_NAME_HEADER|x-forwarded-user|incomming request`s header name (lowercase) specifying the user name|
 |USER_ROLES_HEADER|x-forwarded-groups|incomming request`s header name (lowercase) specifying the list of user roles (or groups)|
-|WEBCOMPONENTS_SELECTOR||comma separate list of key-value pairs, used to filter WebComponent resources handled by this controller|
 |HTTP_PORT|80|port on which the HTTP server listens|
+|SW_VERSION|	v1	|Version of the service worker, used to force the browser to update the service worker|
+|SW_SKIP_FETCH|	| Comma separated list of regular expressions against request paths which should not be fetched by the service worker. All paths that contains /api/ string, or requests to other domains are implicitly skipped reagrdless of this setting. All other requests, including requests toward web components are served with cache-first startegy|
 
 ## Getting Started
 You’ll need a Kubernetes cluster to run against. You can use [KIND](https://sigs.k8s.io/kind) to get a local cluster for testing, or run against a remote cluster.
