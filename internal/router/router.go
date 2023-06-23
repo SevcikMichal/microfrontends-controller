@@ -108,14 +108,14 @@ func passThrough(w http.ResponseWriter, r *http.Request) {
 	log.Println("Request did not match any endpoint passing to web ui.")
 	path := r.URL.Path
 
-	req, err := http.NewRequest("GET", "http://localhost:8082"+path, r.Body) // TODO: Read from config
+	req, err := http.NewRequest("GET", configuration.GetPassThroughServer()+path, r.Body)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	log.Println("Proxying request to resolved URL.", "Resolved URL:", "http://localhost:8082"+path) // TODO: Read from config
+	log.Println("Proxying request to resolved URL.", "Resolved URL:", configuration.GetPassThroughServer()+path)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {

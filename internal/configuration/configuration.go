@@ -30,6 +30,7 @@ const (
 	UserNameHeader             = "USER_NAME_HEADER"
 	UserRolesHeader            = "USER_ROLES_HEADER"
 	WebcomponentsSelector      = "WEBCOMPONENTS_SELECTOR"
+	PassThroughServer          = "PASS_THROUGH_SERVER"
 )
 
 func GetAcceptsLanguages() string {
@@ -168,4 +169,14 @@ func GetUserRolesHeader() string {
 
 func GetWebcomponentsSelector() string {
 	return os.Getenv(WebcomponentsSelector)
+}
+
+func GetPassThroughServer() string {
+	value, ok := os.LookupEnv(PassThroughServer)
+
+	if ok {
+		return value
+	}
+
+	return "http://localhost:8082"
 }
