@@ -27,7 +27,6 @@ type MicroFrontendNavigation struct {
 	Roles      []string                 `json:"roles,omitempty"`
 }
 
-// TODO: Check wheteher some string spliting should be still applied here or not
 func (navigation *MicroFrontendNavigation) ExtractRoles() []string {
 	if len(navigation.Roles) > 0 {
 		return navigation.Roles
