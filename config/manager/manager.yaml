@@ -45,6 +45,8 @@ spec:
         env:
           - name: BASE_URL
             value: "/ui/"
+          - name: HTTP_CSP_HEADER
+            value: "default-src 'self'; font-src 'self' data: https://fonts.googleapis.com/ https://fonts.gstatic.com/; script-src 'strict-dynamic' 'nonce-{NONCE_VALUE}'; manifest-src 'self' https://github.com/login/oauth/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com/ https://fonts.gstatic.com/; img-src 'self' https://seccdn.libravatar.org/; connect-src 'self' https://virtserver.swaggerhub.com/;"
         ports:
         - name: webapi-port
           containerPort: 8082
