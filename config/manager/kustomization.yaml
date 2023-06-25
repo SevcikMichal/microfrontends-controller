@@ -7,4 +7,4 @@ kind: Kustomization
 images:
 - name: controller
   newName: msevcik/microfrontends-controller
-  newTag: 0.0.1
+  newTag: v0.0.1
