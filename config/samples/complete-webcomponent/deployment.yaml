@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: msevcik-ambulance-ufe-container
-        image: msevcik/ambulance-ufe-demo:1.0.0-41
+        image: sevcikmichal/microfrontends-webcomponent-webui-sample:latest
         imagePullPolicy: Always
         ports:
         - name: http

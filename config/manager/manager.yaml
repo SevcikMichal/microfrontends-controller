@@ -40,7 +40,7 @@ spec:
         runAsNonRoot: true
       containers:
       - name: microfrontends-webui-container
-        image: msevcik/microfrontends-webui:v0.0.1
+        image: sevcikmichal/microfrontends-webui:v0.0.2
         imagePullPolicy: Always
         env:
           - name: BASE_URL
